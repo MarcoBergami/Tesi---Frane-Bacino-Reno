@@ -1,0 +1,21 @@
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+
+frane <- read.table("Frane.ArgScagliose.csv",head=TRUE,sep=",")
+names(frane)
+head(frane)
+#### istogramma delle tipologie di frana
+ggplot(frane, aes(x=SIGLA)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=3) +  labs(x="Tipologia di movimenti franosi", y="Numero")
+
+
+freq <- table(frane$NOME_STATO)
+freq.rel <- table(frane$NOME_STATO)/length(frane$NOME_STATO)
+freq.r <- round(freq.rel, digits = 4)
+freq.perc <- paste(freq.r*100, "%", sep ="")
+
+labs <-c ("Non definito","Attivo", "Quiescente", "Stabilizzato") # "non definito" è relativo a depositi di versante, depositi di falda e DGPV
+cols <-c("white","red","lightblue","lightyellow")
+
+pie(freq, main="Stato di attività", labels = freq.perc, col=cols)
+legend(0.7, 1.0, cex = 0.8,  legend=labs, fill=cols)
+
