@@ -10,6 +10,7 @@ theme(axis.text.x=element_text(angle=45,face="bold",size=10,hjust=1),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
 
+
 ### grafico a torta dello stato di attività
 freq <- table(frane$NOME_STATO)
 freq.rel <- table(frane$NOME_STATO)/length(frane$NOME_STATO)
@@ -23,10 +24,13 @@ pie(freq, main="Stato di attività", labels = freq.perc, col=cols)
 legend(0.7, 1.0, cex = 0.8,  legend=labs, fill=cols)
 
 
+
 ### istogramma con suddivisione in classi del perimetro e dell'area dei corpi franosi
 classi.per <- c(0,150,300,600,1200,2400,4800,9600,19200)
-frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T)
-ggplot(frane, aes(x=range.per, y=SHAPE_Leng)) + geom_bar(stat = "identity", position = position_stack(reverse = TRUE)) + labs(x="Classi", y="Numero")
+
+# inserisco un campo nel dataset assegnando ad ogni elemento il proprio intervallo relativo al valore del perimetro (SHAPE_Leng)
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T) 
+ggplot(frane, aes(x=range.per, y=SHAPE_Leng)) + geom_bar(stat = "identity") + labs(x="Classi", y="Numero")
 
 
 
