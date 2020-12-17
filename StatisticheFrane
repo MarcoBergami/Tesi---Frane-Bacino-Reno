@@ -4,6 +4,8 @@ library(ggplot2)
 frane <- read.table("Frane.ArgScagliose.csv",head=TRUE,sep=",")
 names(frane)
 head(frane)
+
+
 #### istogramma delle tipologie di frana
 ggplot(frane, aes(x=SIGLA)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Tipologia di movimenti franosi", y="Numero") +
 theme(axis.text.x=element_text(angle=45,face="bold",size=10,hjust=1),
@@ -29,23 +31,21 @@ legend(0.7, 1.0, cex = 0.8,  legend=labs, fill=cols)
 classi.per <- c(0,150,300,600,1200,2400,4800,9600,19200)
 
 # inserisco un campo nel dataset assegnando ad ogni elemento il proprio intervallo relativo al valore del perimetro (SHAPE_Leng)
-frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T) 
-ggplot(frane, aes(x=range.per, y=SHAPE_Leng)) + geom_bar(stat = "identity") + labs(x="Classi", y="Numero")
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T, dig.lab=10) 
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = seq(0,18000,by=250), include.lowest = T, dig.lab=10) 
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = seq(0,18000,by=500), include.lowest = T, dig.lab=10)
+
+ggplot(frane, aes(x=range.per)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi", y="Numero") +
+theme(axis.text.x=element_text(angle=90, hjust=1))
+
+i <- 500
+f <- 1600000
+seq(0, 1600000, by = ((to - from)/(length.out - 1))
 
 
 
-# scale_y_continuous(labels = scientific) con 10 alla ... 
-# scale_y_continuous(labels = comma)  dovrebbe essere per esteso
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
 
-
-
-
-
-
-
-# ist.per <- hist(frane$SHAPE_Leng, breaks=classi.per)
-# plot(ist.per, main="Perimetro", ylab="Numero", las=1)
 
 
 
