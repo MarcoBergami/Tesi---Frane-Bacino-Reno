@@ -16,7 +16,7 @@ ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar(aes(fill=NOME_STATO)) + geom_text(sta
 labs(x="Tipologia di movimenti franosi", y="Numero", fill="Stato di attività") + 
 theme(axis.text.x=element_text(face="bold",size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300) + scale_fill_brewer(palette = "Spectral")
-
+# cambio titolo legenda
 ###############################################################
 
 
@@ -100,9 +100,18 @@ library(gridExtra)
 
 level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Ovest', 'Nord-Ovest')
 
-ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Esposizione", y="Numero") +
-theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
+ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar(aes(fill=TIPOLOGIA)) + scale_fill_brewer(palette = "Paired") + 
+geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
+
+# Orientamento per tipologia ----> non si nota nessuna particolarità
+
+ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + 
+labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
+
+
+
 
 ######### PENDENZA
 
@@ -113,12 +122,67 @@ ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(la
 labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))  +  ylim(0,2500)
 
-# Le frane attive sono a pendenza magigore ?
+# Le frane attive sono a pendenza maggiore ?
 
-cols <-c("white","red","lightblue","orange")
+cl <- colorRampPalette(c('black','yellow','orange','red','blue','green','lightgreen','violet','pink'))(100)
+
 ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=NOME_STATO), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
 labs(x="Pendenza (°)", y="Numero") 
+
+# correlazione tra pendenza e tipologia
+ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=SIGLA_Tip), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
+labs(x="Pendenza (°)", y="Numero") + scale_fill_brewer(palette = "Spectral")
+
+Perimetro <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Leng)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Perimetro (m)") + guides(color = guide_legend(override.aes = list(size = 3)))
+
+Area <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
+theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+# cambio grandezza simboli colorati in legenda
+
+grid.arrange(Perimetro, Area, nrow = 1) 
+
+######################################################################################
+
+# USO DEL SUOLO
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+library(gridExtra)
+
+UsoSuolo54 <- read.table("StatSuolo54.csv",head=TRUE,sep=",")
+UsoSuolo94 <- read.table("StatSuolo94.csv",head=TRUE,sep=",")
+UsoSuolo2017 <- read.table("StatSuolo2017.csv",head=TRUE,sep=",")
+
+UsoSuolo54 <- UsoSuolo54[-6,] # elimino la riga del dataframe corrispondente ai corpi idrici superficiali
+UsoSuolo94 <- UsoSuolo94[-6,]
+UsoSuolo2017 <- UsoSuolo2017[-1,]
+
+tot54 <- sum(UsoSuolo54$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot94 <- sum(UsoSuolo94$sum)
+tot2017 <- sum(UsoSuolo2017$sum)
+
+UsoSuolo54$Copertura <- (UsoSuolo54$sum/tot54)*100 #aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+UsoSuolo94$Copertura <- (UsoSuolo94$sum/tot94)*100
+UsoSuolo2017$Copertura <- (UsoSuolo2017$sum/tot2017)*100
+
+UsoSuolo54$Anno <- 1954 # aggiungo il campo corrispondente all'anno
+UsoSuolo94$Anno <- 1994
+UsoSuolo2017$Anno <- 2017
+
+total <- rbind(UsoSuolo54, UsoSuolo94, UsoSuolo2017) # unisco i dataset
+total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
+
+level_order <- c('1954', '1994', '2017')
+ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+scale_fill_brewer(palette = "Spectral") + labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + 
+geom_text(aes(label = Copertura), position = position_dodge(0.9), vjust=-1, size=4) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title = element_text(size=15)) +  ylim(0,100) 
+
 
 
 
