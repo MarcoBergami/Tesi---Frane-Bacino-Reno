@@ -5,12 +5,19 @@ frane <- read.table("Frane.ArgScagliose.csv",head=TRUE,sep=",")
 names(frane)
 head(frane)
 
-
+###########################################################
 #### istogramma delle tipologie di frana
-ggplot(frane, aes(x=SIGLA)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Tipologia di movimenti franosi", y="Numero") +
-theme(axis.text.x=element_text(angle=45,face="bold",size=10,hjust=1),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Tipologia di movimenti franosi", y="Numero") +
+theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300)
 
+
+ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar(aes(fill=NOME_STATO)) + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +
+labs(x="Tipologia di movimenti franosi", y="Numero", fill="Stato di attività") + 
+theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300) + scale_fill_brewer(palette = "Spectral")
+
+###############################################################
 
 
 ### grafico a torta dello stato di attività
@@ -25,22 +32,98 @@ cols <-c("white","red","lightblue","orange")
 pie(freq, main="Stato di attività", labels = freq.perc, col=cols)
 legend(0.7, 1.0, cex = 0.8,  legend=labs, fill=cols)
 
+#########################################################################################################################
 
-
-### istogramma con suddivisione in classi del perimetro e dell'area dei corpi franosi
+##########  istogramma con suddivisione in classi del perimetro dei corpi franosi
 classi.per <- c(0,150,300,600,1200,2400,4800,9600,19200)
 
 # inserisco un campo nel dataset assegnando ad ogni elemento il proprio intervallo relativo al valore del perimetro (SHAPE_Leng)
 frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T, dig.lab=10) 
+
+ggplot(frane, aes(x=range.per)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi (m)", y="Numero") +
+theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10), axis.text.y=element_text(size=13), 
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1250)
+
 frane$range.per <- cut(frane$SHAPE_Leng, breaks = seq(0,18000,by=250), include.lowest = T, dig.lab=10) 
-frane$range.per <- cut(frane$SHAPE_Leng, breaks = seq(0,18000,by=500), include.lowest = T, dig.lab=10)
+ggplot(frane, aes(x=range.per)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi (m)", y="Numero") +
+theme(axis.text.x=element_text(angle=60,face="bold",hjust=1),axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-ggplot(frane, aes(x=range.per)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi", y="Numero") +
-theme(axis.text.x=element_text(angle=90, hjust=1))
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = seq(0,18000,by=500), include.lowest = T, dig.lab=10) 
+ggplot(frane, aes(x=range.per)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi (m)", y="Numero") +
+theme(axis.text.x=element_text(angle=60,face="bold",hjust=1),axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-i <- 500
-f <- 1600000
-seq(0, 1600000, by = ((to - from)/(length.out - 1))
+##########  istogramma con suddivisione in classi dell'area dei corpi franosi
+
+classi.area <- c(0,500,1000,2500,5000,7500,10000,25000,50000,75000,100000,250000,500000,750000,1000000,1500000,2000000)
+frane$range.area <- cut(frane$SHAPE_Area, breaks = classi.area, include.lowest = T, dig.lab=10)
+# Per l'area non vengono svolte suddivisioni in classi per incrementi costanti in quanto il valore max è molto grande e il numero di classi risultante sarebbe altissimo
+
+ggplot(frane, aes(x=range.area)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Classi (mq)", y="Numero") +
+theme(axis.text.x=element_text(angle=60,face="bold",size=10,hjust=1), axis.text.y=element_text(size=13), 
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1100)
+
+
+#################################################################################################
+
+##########  istogramma classi perimetro - tipologia
+
+classi.per <- c(0,150,300,600,1200,2400,4800,9600,19200)
+frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T, dig.lab=10) 
+
+ggplot(frane, aes(range.per)) + geom_bar(aes(fill=TIPOLOGIA), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1250) +
+labs(x="Classi (m)", y="Numero") + scale_fill_brewer(palette = "Spectral")
+
+classi.area <- c(0,500,1000,2500,5000,7500,10000,25000,50000,75000,100000,250000,500000,750000,1000000,1500000,2000000)
+frane$range.area <- cut(frane$SHAPE_Area, breaks = classi.area, include.lowest = T, dig.lab=10)
+
+ggplot(frane, aes(range.area)) + geom_bar(aes(fill=TIPOLOGIA), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1100) +
+labs(x="Classi (mq)", y="Numero") + scale_fill_brewer(palette = "Spectral")
+
+
+########################################################################################################
+
+######## Scatterplot tra area/perimetro e tipologia
+
+ggplot(frane, aes(x=SHAPE_Leng, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA))  
+
+ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point() + labs(x="Tipologia di movimenti franosi", y="Area") + theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+
+
+######################################################################################à
+
+######### ORIENTAMENTO
+library(gridExtra)
+
+level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Ovest', 'Nord-Ovest')
+
+ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Esposizione", y="Numero") +
+theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
+
+######### PENDENZA
+
+classi.pend <- c(0,5,10,15,20,25,30,35,40,45)
+frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10)
+
+ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  
+labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))  +  ylim(0,2500)
+
+# Le frane attive sono a pendenza magigore ?
+
+cols <-c("white","red","lightblue","orange")
+ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=NOME_STATO), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
+labs(x="Pendenza (°)", y="Numero") 
+
+
+
+
+
 
 
 
