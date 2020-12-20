@@ -65,7 +65,7 @@ axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(
 
 #################################################################################################
 
-##########  istogramma classi perimetro - tipologia
+##########  istogramma classi perimetro - tipologia e area - tipologia
 
 classi.per <- c(0,150,300,600,1200,2400,4800,9600,19200)
 frane$range.per <- cut(frane$SHAPE_Leng, breaks = classi.per, include.lowest = T, dig.lab=10) 
@@ -111,7 +111,7 @@ labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
 
 
-
+#######################################################################
 
 ######### PENDENZA
 
@@ -122,7 +122,16 @@ ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(la
 labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))  +  ylim(0,2500)
 
-# Le frane attive sono a pendenza maggiore ?
+# classi più piccole
+classi.pend <- c(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45)
+frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10)
+
+ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  
+labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))  +  ylim(0,1500)
+
+
+############ Le frane attive sono a pendenza maggiore ?
 
 cl <- colorRampPalette(c('black','yellow','orange','red','blue','green','lightgreen','violet','pink'))(100)
 
@@ -130,7 +139,7 @@ ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=NOME_STATO), width = 0.5) + t
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
 labs(x="Pendenza (°)", y="Numero") 
 
-# correlazione tra pendenza e tipologia
+############ correlazione tra pendenza e tipologia
 ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=SIGLA_Tip), width = 0.5) + theme(axis.text.x=element_text(angle=60,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
 labs(x="Pendenza (°)", y="Numero") + scale_fill_brewer(palette = "Spectral")
@@ -139,11 +148,20 @@ Perimetro <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Leng)) + geom_point(aes(col=T
 labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Perimetro (m)") + guides(color = guide_legend(override.aes = list(size = 3)))
 
 Area <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
-labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
-theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+labs(col="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
+theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank())
 # cambio grandezza simboli colorati in legenda
 
 grid.arrange(Perimetro, Area, nrow = 1) 
+
+######### correlazione tra pendenza e orientamento
+
+level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Ovest', 'Nord-Ovest')
+
+ggplot(frane, aes(x = factor(PuntoCard, level = level_order), y=Pendenza)) + geom_point() + labs(x="Esposizione", y="Pendenza media (°)") +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
+geom_line() 
+
 
 ######################################################################################
 
