@@ -102,7 +102,7 @@ level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Oves
 
 ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar(aes(fill=TIPOLOGIA)) + scale_fill_brewer(palette = "Paired") + 
 geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_blank()) +  ylim(0,650)
 
 # Orientamento per tipologia ----> non si nota nessuna particolarità
 
