@@ -96,7 +96,7 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 ######################################################################################à
 
 ######### ORIENTAMENTO
-library(gridExtra)
+
 
 level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Ovest', 'Nord-Ovest')
 
@@ -110,6 +110,10 @@ ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + ge
 labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
 
+# Orientamento, area e tipologia
+ggplot(frane, aes(x = factor(PuntoCard, level = level_order), y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+labs(col="Tipologia di movimenti franosi", x="Esposizione", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
+theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank())
 
 #######################################################################
 
@@ -144,15 +148,15 @@ ggplot(frane, aes(range.pend)) + geom_bar(aes(fill=SIGLA_Tip), width = 0.5) + th
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2500) +
 labs(x="Pendenza (°)", y="Numero") + scale_fill_brewer(palette = "Spectral")
 
-Perimetro <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Leng)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+ggplot(frane, aes(x=Pendenza, y=SHAPE_Leng)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
 labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Perimetro (m)") + guides(color = guide_legend(override.aes = list(size = 3)))
 
-Area <- ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
 labs(col="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
 theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank())
 # cambio grandezza simboli colorati in legenda
 
-grid.arrange(Perimetro, Area, nrow = 1) 
+
 
 ######### correlazione tra pendenza e orientamento
 
@@ -161,6 +165,19 @@ level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Oves
 ggplot(frane, aes(x = factor(PuntoCard, level = level_order), y=Pendenza)) + geom_point() + labs(x="Esposizione", y="Pendenza media (°)") +
 theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
 geom_line() 
+
+# pendenza maggiore di 30°
+
+Pend30 <- read.table("Pend30.csv",head=TRUE,sep=",")
+
+ggplot(Pend30, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + 
+labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
+ggplot(Pend30, aes(x = SIGLA_Tip)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + 
+labs(x="Tipologia di movimenti franosi", y="Numero") + theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
 
 
 ######################################################################################
@@ -195,6 +212,7 @@ total <- rbind(UsoSuolo54, UsoSuolo94, UsoSuolo2017) # unisco i dataset
 total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
 
 level_order <- c('1954', '1994', '2017')
+
 ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
 scale_fill_brewer(palette = "Spectral") + labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + 
 geom_text(aes(label = Copertura), position = position_dodge(0.9), vjust=-1, size=4) + theme(axis.text.x=element_text(face="bold",size=12),
