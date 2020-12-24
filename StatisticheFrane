@@ -12,11 +12,11 @@ theme(axis.text.x=element_text(face="bold",size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300)
 
 
-ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar(aes(fill=NOME_STATO)) + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +
-labs(x="Tipologia di movimenti franosi", y="Numero", fill="Stato di attività") + 
-theme(axis.text.x=element_text(face="bold",size=10),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300) + scale_fill_brewer(palette = "Spectral")
-# cambio titolo legenda
+ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar(aes(fill=TIPOLOGIA)) + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +
+labs(x="Tipologia di movimenti franosi", y="Numero") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_blank(), legend.text = element_text(size=12)) + 
+ylim(0, 1300) + scale_fill_brewer(palette = "Paired")
+
 ###############################################################
 
 
@@ -88,8 +88,10 @@ labs(x="Classi (mq)", y="Numero") + scale_fill_brewer(palette = "Spectral")
 
 ggplot(frane, aes(x=SHAPE_Leng, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA))  
 
-ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point() + labs(x="Tipologia di movimenti franosi", y="Area") + theme(axis.text.x=element_text(face="bold",size=10),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired") +
+labs(x="Tipologia di movimenti franosi", y="Area") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12),legend.title=element_blank()) + 
+guides(color = guide_legend(override.aes = list(size = 3)))
 
 
 
@@ -218,7 +220,7 @@ scale_fill_brewer(palette = "Spectral") + labs(fill="Classi di uso del suolo", x
 geom_text(aes(label = Copertura), position = position_dodge(0.9), vjust=-1, size=4) + theme(axis.text.x=element_text(face="bold",size=12),
 axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
 legend.text = element_text(size=12), legend.title = element_text(size=15)) +  ylim(0,100) 
-
+# cambio titolo legenda
 
 
 
