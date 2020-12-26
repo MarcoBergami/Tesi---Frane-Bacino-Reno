@@ -233,17 +233,80 @@ legend.text = element_text(size=12), legend.title = element_text(size=15)) +  yl
 # cambio titolo legenda
 
 
+#########################################################################################
+
+######## verifica realzione tra pendenza e dislivello
+
+library(ggplot2)
+library(scales)
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+frane <- read.table("Frane.ArgScagliose.csv",head=TRUE,sep=",")
+
+ggplot(frane, aes(x=Pendenza, y=Dislivello)) + geom_point() +
+labs(x="Pendenza media (°)", y="Dislivello (m)") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+# sembra che per pendenze molto alte si abbiano dislivelli piccoli e viceversa
+# vuol dire che le frane a dislivello molto alto e pendenza bassa o sono molto allungate o presentano una morfologia eterogenea, 
+# con aree anche abbastanza pianeggianti, che "falsifica" il calcolo della pendenza media
+
+########## Rc e dislivello
+
+ggplot(frane, aes(x=Rc, y=Dislivello)) + geom_point() +
+labs(x="Rapporto di circolarità", y="Dislivello del deposito franoso (m)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + geom_smooth(method = 'loess')
+
+log.labs <- c(10,100)
+
+ggplot(frane, aes(x=Rc, y=Dislivello)) + geom_point() +
+labs(x="Rapporto di circolarità", y="Log10 - Dislivello del deposito franoso (m)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + geom_smooth(method = 'lm') + 
+scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.x)))
+
+####### Rc e tipologia
+
+ggplot(frane, aes(x=SIGLA_Tip, y=Rc)) + geom_boxplot() +
+labs(x="Tipologia di movimenti franosi", y="Rapporto di circolarità") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+ggplot(frane, aes(x=SIGLA_Tip, y=Rc)) + geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") + 
+labs(x="Tipologia di movimenti franosi", y="Rapporto di circolarità") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+######## Rc e pendenza
+
+ggplot(frane, aes(x=Rc, y=Pendenza)) + geom_point() + geom_smooth(method = 'lm') + 
+labs(x="Rapporto di circolarità", y="Pendenza media (°)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+##### Rc e area
+
+ggplot(frane, aes(x=Rc, y=SHAPE_Area)) + geom_point() + geom_smooth(method = 'loess') + 
+labs(x="Rapporto di circolarità", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+log.labs <- c(100,1000,10000,100000,1000000)
+
+ggplot(frane, aes(x=Rc, y=SHAPE_Area)) + geom_point() + geom_smooth(method = 'lm') + 
+labs(x="Rapporto di circolarità", y="Log10 - Area del deposito franoso (mq)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
+scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.x)))
 
 
+###### Rc e perimetro
+
+ggplot(frane, aes(x=Rc, y=SHAPE_Leng)) + geom_point() + geom_smooth(method = 'loess') + 
+labs(x="Rapporto di circolarità", y="Perimetro del deposito franoso (m)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+log.labs <- c(100,1000,10000)
+
+ggplot(frane, aes(x=Rc, y=SHAPE_Leng)) + geom_point() + geom_smooth(method = 'lm') + 
+labs(x="Rapporto di circolarità", y="Log10 - Perimetro del deposito franoso (m)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
+scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.x)))
 
 
 
 
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
-
-
-
-
-
-
-
