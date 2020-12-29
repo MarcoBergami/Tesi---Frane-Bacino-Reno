@@ -147,11 +147,16 @@ labs(x="Pendenza (°)", y="Numero") + scale_fill_brewer(palette = "Spectral")
 ggplot(frane, aes(x=Pendenza, y=SHAPE_Leng)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
 labs(fill="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Perimetro (m)") + guides(color = guide_legend(override.aes = list(size = 3)))
 
-ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
-labs(col="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
-theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank())
-# cambio grandezza simboli colorati in legenda
 
+y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
+y.lab <- c('0','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
+
+ggplot(frane, aes(x=Pendenza, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
+labs(col="Tipologia di movimenti franosi", x="Pendenza media (°)", y="Area del deposito franoso (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
+theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank()) + 
+scale_y_continuous(breaks = y.break, labels = y.lab)
+
+# cambio grandezza simboli colorati in legenda
 
 
 ######### correlazione tra pendenza e orientamento
@@ -174,6 +179,9 @@ ggplot(Pend30, aes(x = SIGLA_Tip)) + geom_bar() + geom_text(stat='count', aes(la
 labs(x="Tipologia di movimenti franosi", y="Numero") + theme(axis.text.x=element_text(face="bold",size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
 
+ggplot(Pend30, aes(x = SIGLA_Tip, y=SHAPE_Area)) + geom_boxplot() + 
+labs(x="Tipologia di movimenti franosi", y="Area (mq)") + theme(axis.text.x=element_text(face="bold",size=10),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
 
 ######################################################################################
@@ -210,11 +218,12 @@ total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di c
 level_order <- c('1954', '1994', '2017')
 
 ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
-scale_fill_brewer(palette = "Spectral") + labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + 
+labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + scale_fill_brewer(palette = "Spectral")  + 
 geom_text(aes(label = Copertura), position = position_dodge(0.9), vjust=-1, size=4) + theme(axis.text.x=element_text(face="bold",size=12),
 axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title = element_text(size=15)) +  ylim(0,100) 
+legend.text = element_text(size=12), legend.title = element_text(size=15))  +  ylim(0,60)
 # cambio titolo legenda
+
 
 
 #########################################################################################
