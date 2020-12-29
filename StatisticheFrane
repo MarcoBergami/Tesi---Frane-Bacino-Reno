@@ -7,27 +7,22 @@ head(frane)
 
 ###########################################################
 #### istogramma delle tipologie di frana
-ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  labs(x="Tipologia di movimenti franosi", y="Numero") +
-theme(axis.text.x=element_text(face="bold",size=10),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1300)
-
 
 ggplot(frane, aes(x=SIGLA_Tip)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +
 labs(x="Tipologia di movimenti franosi", y="Numero") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_blank(), legend.text = element_text(size=12)) + 
-ylim(0, 1300)
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + ylim(0, 1300)
 
 ###############################################################
 
 
 ### grafico a torta dello stato di attività
 freq <- table(frane$NOME_STATO)
-freq.rel <- table(frane$NOME_STATO)/length(frane$NOME_STATO)
+freq.rel <- freq/length(frane$NOME_STATO)
 freq.r <- round(freq.rel, digits = 4)
 freq.perc <- paste(freq.r*100, "%", sep ="")
 
-labs <-c ("Non definito","Attivo", "Quiescente", "Stabilizzato") # "non definito" è relativo a depositi di versante, depositi di falda e DGPV
-cols <-c("white","red","lightblue","orange")
+labs <-c ("Attivo","Non definito","Quiescente","Stabilizzato") # "non definito" è relativo a depositi di versante, depositi di falda e DGPV
+cols <-c("red","white","lightblue","orange")
 
 pie(freq, main="Stato di attività", labels = freq.perc, col=cols)
 legend(0.7, 1.0, cex = 0.8,  legend=labs, fill=cols)
@@ -68,7 +63,7 @@ frane$range.area <- cut(frane$SHAPE_Area, breaks = classi.area, include.lowest =
 
 ggplot(frane, aes(x=range.area)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Area dei depositi franosi (mq)", y="Numero") +
 theme(axis.text.x=element_text(angle=30,face="bold",size=10,hjust=1), axis.text.y=element_text(size=13), 
-axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 2000)
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1750)
 
 
 #################################################################################################
@@ -92,17 +87,15 @@ labs(x="Classi (mq)", y="Numero") + scale_fill_brewer(palette = "Spectral")
 
 ########################################################################################################
 
-######## Scatterplot tra area/perimetro e tipologia
+######## Scatterplot tra area e tipologia
 
-ggplot(frane, aes(x=SHAPE_Leng, y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA))  
+y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
+y.lab <- c('0','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
 
 ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point() +
 labs(x="Tipologia di movimenti franosi", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
-
-ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_boxplot() +
-labs(x="Tipologia di movimenti franosi", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
+scale_y_continuous(breaks = y.break, labels = y.lab)
 
 
 ######################################################################################à
@@ -112,27 +105,18 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 
 level_order <- c('Nord', 'Nord-Est', 'Est', 'Sud-Est', 'Sud', 'Sud-Ovest', 'Ovest', 'Nord-Ovest')
 
-ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar(aes(fill=TIPOLOGIA)) + scale_fill_brewer(palette = "Paired") + 
-geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), legend.title=element_blank()) +  ylim(0,650)
-
-# Orientamento per tipologia ----> non si nota nessuna particolarità
-
 ggplot(frane, aes(x = factor(PuntoCard, level = level_order))) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) + 
 labs(x="Esposizione", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0,650)
 
-# Orientamento, area e tipologia
-ggplot(frane, aes(x = factor(PuntoCard, level = level_order), y=SHAPE_Area)) + geom_point(aes(col=TIPOLOGIA)) + scale_color_brewer(palette = "Paired")  + 
-labs(col="Tipologia di movimenti franosi", x="Esposizione", y="Area (mq)") + guides(color = guide_legend(override.aes = list(size = 3))) + 
-theme(axis.title.x=element_text(size=15), axis.title.y=element_text(size=15),legend.text = element_text(size=12), legend.title=element_blank())
 
 #######################################################################
 
 ######### PENDENZA
 
 classi.pend <- c(0,5,10,15,20,25,30,35,40,45)
-frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10)
+labs.pend <- c('0-5','5-10','10-15','15-20','20-25','25-30','30-35','35-40','40-45')
+frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10,  labels = labs.pend)
 
 ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  
 labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
