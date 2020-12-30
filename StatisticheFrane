@@ -235,13 +235,15 @@ library(scales)
 setwd("C:/QGIS/Tesi.FraneBacinoReno")
 frane <- read.table("Frane.ArgScagliose.csv",head=TRUE,sep=",")
 
-ggplot(frane, aes(x=Pendenza, y=Dislivello)) + geom_point() +
-labs(x="Pendenza media (°)", y="Dislivello (m)") + theme(axis.text.x=element_text(face="bold",size=11),
+ggplot(frane, aes(x=range.pend, y=Dislivello)) + geom_point() + 
+labs(x="Pendenza media (°)", y="Dislivello del deposito franoso (m)") + theme(axis.text.x=element_text(face="bold",size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
+
 # sembra che per pendenze molto alte si abbiano dislivelli piccoli e viceversa
-# vuol dire che le frane a dislivello molto alto e pendenza bassa o sono molto allungate o presentano una morfologia eterogenea, 
-# con aree anche abbastanza pianeggianti, che "falsifica" il calcolo della pendenza media
+# vuol dire che le frane a dislivello molto alto e pendenza bassa sono molto allungate:
+# per dislivelli maggiori di 400 m (666 m max) vi sono 20 corpi franosi tutti aventi pendenza media tra i 10 e i 28° circa e area maggiore di 100 000 mq,
+#cioè al di sopra del 90esimo percentile della distribuzione in termini di area.
 
 ########## Rc e dislivello
 
@@ -258,10 +260,6 @@ scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.
 
 ####### Rc e tipologia
 
-ggplot(frane, aes(x=SIGLA_Tip, y=Rc)) + geom_boxplot() +
-labs(x="Tipologia di movimenti franosi", y="Rapporto di circolarità") + theme(axis.text.x=element_text(size=11),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
-
 ggplot(frane, aes(x=SIGLA_Tip, y=Rc)) + geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") + 
 labs(x="Tipologia di movimenti franosi", y="Rapporto di circolarità") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
@@ -272,11 +270,20 @@ ggplot(frane, aes(x=Rc, y=Pendenza)) + geom_point() + geom_smooth(method = 'lm')
 labs(x="Rapporto di circolarità", y="Pendenza media (°)") + theme(axis.text.x=element_text(size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
+ggplot(frane, aes(x=Rc, y=Pendenza)) + geom_point() + geom_smooth(method = 'lm') + 
+labs(x="Rapporto di circolarità", y="Pendenza media (°)") + theme(axis.text.x=element_text(size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
+scale_y_log10()
+
 ##### Rc e area
+
+y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
+y.lab <- c('0','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
 
 ggplot(frane, aes(x=Rc, y=SHAPE_Area)) + geom_point() + geom_smooth(method = 'loess') + 
 labs(x="Rapporto di circolarità", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(size=11),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + scale_y_continuous(breaks = y.break, labels = y.lab)
+
 
 log.labs <- c(100,1000,10000,100000,1000000)
 
@@ -288,9 +295,12 @@ scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.
 
 ###### Rc e perimetro
 
+y.break <- c(0,5000,10000,15000)
+y.lab <- c('0','5 000','10 000','15 000')
+
 ggplot(frane, aes(x=Rc, y=SHAPE_Leng)) + geom_point() + geom_smooth(method = 'loess') + 
 labs(x="Rapporto di circolarità", y="Perimetro del deposito franoso (m)") + theme(axis.text.x=element_text(size=11),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + scale_y_continuous(breaks = y.break, labels = y.lab)
 
 log.labs <- c(100,1000,10000)
 
