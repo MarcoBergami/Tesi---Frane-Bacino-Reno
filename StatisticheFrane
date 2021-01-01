@@ -124,7 +124,8 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 
 # classi più piccole
 classi.pend <- c(0,3,6,9,12,15,18,21,24,27,30,33,36,39,42,45)
-frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10)
+labs.pend <- c('0-3','3-6','6-9','9-12','12-15','15-18','18-21','21-24','24-27','27-30','30-33','33-36','36-39','39-42','42-45')
+frane$range.pend <- cut(frane$Pendenza, breaks = classi.pend, include.lowest = T, dig.lab=10, labels = labs.pend)
 
 ggplot(frane, aes(x = range.pend)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1, size=4) +  
 labs(x="Pendenza (°)", y="Numero") + theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10),
@@ -244,6 +245,13 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 # vuol dire che le frane a dislivello molto alto e pendenza bassa sono molto allungate:
 # per dislivelli maggiori di 400 m (666 m max) vi sono 20 corpi franosi tutti aventi pendenza media tra i 10 e i 28° circa e area maggiore di 100 000 mq,
 #cioè al di sopra del 90esimo percentile della distribuzione in termini di area.
+
+# -> il dislivello è un indicatore più preciso dell'area (dimensione) delle frane?
+
+ggplot(frane, aes(x=Dislivello, y=SHAPE_Area)) + geom_point() + 
+labs(x="Dislivello (m)", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
 
 ########## Rc e dislivello
 
