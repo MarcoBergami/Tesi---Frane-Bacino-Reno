@@ -277,47 +277,6 @@ theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10), axis.text.
 axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
 legend.text = element_text(size=12), legend.title=element_blank()) + ylim(0,900)
 
-######################################################################################
-
-# USO DEL SUOLO
-
-setwd("C:/QGIS/Tesi.FraneBacinoReno")
-library(ggplot2)
-library(gridExtra)
-
-UsoSuolo54 <- read.table("StatSuolo54.csv",head=TRUE,sep=",")
-UsoSuolo94 <- read.table("StatSuolo94.csv",head=TRUE,sep=",")
-UsoSuolo2017 <- read.table("StatSuolo2017.csv",head=TRUE,sep=",")
-
-UsoSuolo54 <- UsoSuolo54[-6,] # elimino la riga del dataframe corrispondente ai corpi idrici superficiali
-UsoSuolo94 <- UsoSuolo94[-6,]
-UsoSuolo2017 <- UsoSuolo2017[-1,]
-
-tot54 <- sum(UsoSuolo54$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
-tot94 <- sum(UsoSuolo94$sum)
-tot2017 <- sum(UsoSuolo2017$sum)
-
-UsoSuolo54$Copertura <- (UsoSuolo54$sum/tot54)*100 #aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
-UsoSuolo94$Copertura <- (UsoSuolo94$sum/tot94)*100
-UsoSuolo2017$Copertura <- (UsoSuolo2017$sum/tot2017)*100
-
-UsoSuolo54$Anno <- 1954 # aggiungo il campo corrispondente all'anno
-UsoSuolo94$Anno <- 1994
-UsoSuolo2017$Anno <- 2017
-
-total <- rbind(UsoSuolo54, UsoSuolo94, UsoSuolo2017) # unisco i dataset
-total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
-
-level_order <- c('1954', '1994', '2017')
-
-ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
-labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + scale_fill_brewer(palette = "Spectral")  + 
-geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
-axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title = element_text(size=15))  +  ylim(0,60)
-# cambio titolo legenda
-
-
 
 #########################################################################################
 
@@ -352,7 +311,7 @@ grid.arrange(Pend.Area, Disl.Area, nrow = 1)
 
 # -> il dislivello è un indicatore più preciso dell'area (dimensione) delle frane?
 
-# con le sole frane entro i versanti di Argille Scagliose
+########## con le sole frane entro i versanti di Argille Scagliose
 frane.vers <- read.table("Frane.Versanti.csv",head=TRUE,sep=",")
 
 y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
@@ -374,6 +333,9 @@ ggplot(frane.vers, aes(x=Dislivello, y=SHAPE_Leng)) + geom_point() +
 labs(x="Dislivello altimetrico (m)", y="Perimetro (m)") + theme(axis.text.x=element_text(face="bold",size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + geom_smooth(method = 'loess')
 
+###########################################################################################
+
+################### RAPPORTO DI CIRCOLARITA'
 
 ########## Rc e dislivello
 
@@ -435,6 +397,229 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 scale_y_log10(breaks = log.labs, labels = trans_format("log10", math_format(10^.x)))
 
 ###################################################################################
+
+######################################################################################
+
+# USO DEL SUOLO
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+library(gridExtra)
+
+UsoSuolo54 <- read.table("StatSuolo54.csv",head=TRUE,sep=",")
+UsoSuolo94 <- read.table("StatSuolo94.csv",head=TRUE,sep=",")
+UsoSuolo2017 <- read.table("StatSuolo2017.csv",head=TRUE,sep=",")
+
+UsoSuolo54 <- UsoSuolo54[-6,] # elimino la riga del dataframe corrispondente ai corpi idrici superficiali
+UsoSuolo94 <- UsoSuolo94[-6,]
+UsoSuolo2017 <- UsoSuolo2017[-1,]
+
+tot54 <- sum(UsoSuolo54$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot94 <- sum(UsoSuolo94$sum)
+tot2017 <- sum(UsoSuolo2017$sum)
+
+UsoSuolo54$Copertura <- (UsoSuolo54$sum/tot54)*100 #aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+UsoSuolo94$Copertura <- (UsoSuolo94$sum/tot94)*100
+UsoSuolo2017$Copertura <- (UsoSuolo2017$sum/tot2017)*100
+
+UsoSuolo54$Anno <- 1954 # aggiungo il campo corrispondente all'anno
+UsoSuolo94$Anno <- 1994
+UsoSuolo2017$Anno <- 2017
+
+total <- rbind(UsoSuolo54, UsoSuolo94, UsoSuolo2017) # unisco i dataset
+total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
+
+level_order <- c('1954', '1994', '2017')
+
+ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(fill="Classi di uso del suolo", x="Anno", y="Copertura (%)") + scale_fill_brewer(palette = "Spectral")  + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title = element_text(size=15))  +  ylim(0,60)
+# cambio titolo legenda
+
+############## DIFFERENZA TRA TERRITORIO IN FRANA E NON IN FRANA
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+
+Suolo54.SoloFrana <- read.table("Suolo54.SoloFrana.csv",head=TRUE,sep=",")
+Suolo94.SoloFrana <- read.table("Suolo94.SoloFrana.csv",head=TRUE,sep=",")
+Suolo2017.SoloFrana <- read.table("Suolo2017.SoloFrana.csv",head=TRUE,sep=",")
+Suolo54.NonFrana <- read.table("Suolo54.NonFrana.csv",head=TRUE,sep=",")
+Suolo94.NonFrana <- read.table("Suolo94.NonFrana.csv",head=TRUE,sep=",")
+Suolo2017.NonFrana <- read.table("Suolo2017.NonFrana.csv",head=TRUE,sep=",")
+
+Suolo54.SoloFrana <- Suolo54.SoloFrana[-5,] # elimino la riga del dataframe corrispondente ai corpi idrici superficiali
+Suolo94.SoloFrana <- Suolo94.SoloFrana[-6,]
+Suolo2017.SoloFrana <- Suolo2017.SoloFrana[-6,]
+Suolo54.NonFrana <- Suolo54.NonFrana[-6,] 
+Suolo94.NonFrana <- Suolo94.NonFrana[-6,]
+Suolo2017.NonFrana <- Suolo2017.NonFrana[-1,]
+
+tot54.SoloFrana <- sum(Suolo54.SoloFrana$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot94.SoloFrana <- sum(Suolo94.SoloFrana$sum)
+tot2017.SoloFrana <- sum(Suolo2017.SoloFrana$sum)
+tot54.NonFrana <- sum(Suolo54.NonFrana$sum) 
+tot94.NonFrana <- sum(Suolo94.NonFrana$sum)
+tot2017.NonFrana <- sum(Suolo2017.NonFrana$sum)
+
+Suolo54.SoloFrana$Copertura <- (Suolo54.SoloFrana$sum/tot54.SoloFrana)*100 #aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+Suolo94.SoloFrana$Copertura <- (Suolo94.SoloFrana$sum/tot94.SoloFrana)*100
+Suolo2017.SoloFrana$Copertura <- (Suolo2017.SoloFrana$sum/tot2017.SoloFrana)*100
+Suolo54.NonFrana$Copertura <- (Suolo54.NonFrana$sum/tot54.NonFrana)*100 
+Suolo94.NonFrana$Copertura <- (Suolo94.NonFrana$sum/tot94.NonFrana)*100
+Suolo2017.NonFrana$Copertura <- (Suolo2017.NonFrana$sum/tot2017.NonFrana)*100
+
+Suolo54.SoloFrana$Anno <- 1954 # aggiungo il campo corrispondente all'anno
+Suolo94.SoloFrana$Anno <- 1994
+Suolo2017.SoloFrana$Anno <- 2017
+Suolo54.NonFrana$Anno <- 1954 
+Suolo94.NonFrana$Anno <- 1994
+Suolo2017.NonFrana$Anno <- 2017
+
+total.SoloFrana <- rbind(Suolo54.SoloFrana, Suolo94.SoloFrana, Suolo2017.SoloFrana) # unisco i dataset
+total.NonFrana <- rbind(Suolo54.NonFrana, Suolo94.NonFrana, Suolo2017.NonFrana) 
+
+total.SoloFrana$Copertura <- round(total.SoloFrana$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
+total.NonFrana$Copertura <- round(total.NonFrana$Copertura, digits = 1)
+
+level_order <- c('1954', '1994', '2017')
+
+SoloFrana <- ggplot(total.SoloFrana, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="territorio interessato dai depositi di frana") +
+scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
+
+NonFrana <- ggplot(total.NonFrana, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="fascia di 100m attorno ai depositi di frana") +
+scale_fill_brewer(palette = "Spectral")  + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank())  +  ylim(0,60)
+
+grid.arrange(SoloFrana, NonFrana, nrow = 1)
+
+
+############## DIFFERENZA TRA TERRITORIO IN FRANA E NON IN FRANA TRA FRANE ATTIVE E NON ATTIVE
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno/Nuova cartella")
+library(ggplot2)
+
+att.frana.54 <- read.table("Attive.Solofrana54.csv",head=TRUE,sep=",")
+att.frana.94 <- read.table("Attive.Solofrana94.csv",head=TRUE,sep=",")
+att.frana.2017 <- read.table("Attive.Solofrana2017.csv",head=TRUE,sep=",")
+att.non.54 <- read.table("Attive.Nonfrana54.csv",head=TRUE,sep=",")
+att.non.94 <- read.table("Attive.Nonfrana94.csv",head=TRUE,sep=",")
+att.non.2017 <- read.table("Attive.Nonfrana2017.csv",head=TRUE,sep=",")
+quie.frana.54 <- read.table("Quiescenti.Solofrana54.csv",head=TRUE,sep=",")
+quie.frana.94 <- read.table("Quiescenti.Solofrana94.csv",head=TRUE,sep=",")
+quie.frana.2017 <- read.table("Quiescenti.Solofrana2017.csv",head=TRUE,sep=",")
+quie.non.54 <- read.table("Quiescenti.Nonfrana54.csv",head=TRUE,sep=",")
+quie.non.94 <- read.table("Quiescenti.Nonfrana94.csv",head=TRUE,sep=",")
+quie.non.2017 <- read.table("Quiescenti.Nonfrana2017.csv",head=TRUE,sep=",")
+
+att.frana.54 <- att.frana.54[-1,] # elimino la riga del dataframe corrispondente ai corpi idrici superficiali
+att.frana.94 <- att.frana.94[-5,]
+att.frana.2017 <- att.frana.2017[-6,]
+att.non.54 <- att.non.54[-6,] 
+att.non.94 <- att.non.94[-6,]
+att.non.2017 <- att.non.2017[-1,]
+quie.frana.54 <- quie.frana.54[-2,]
+quie.frana.94 <- quie.frana.94[-5,]
+quie.frana.2017 <- quie.frana.2017[-5,]
+quie.non.54 <- quie.non.54[-6,] 
+quie.non.94 <- quie.non.94[-6,]
+quie.non.2017 <- quie.non.2017[-1,]
+
+tot54.att.frana <- sum(att.frana.54$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot94.att.frana <- sum(att.frana.94$sum)
+tot2017.att.frana <- sum(att.frana.2017$sum)
+tot54.att.non <- sum(att.non.54$sum) 
+tot94.att.non <- sum(att.non.94$sum)
+tot2017.att.non <- sum(att.non.2017$sum)
+tot54.quie.frana <- sum(quie.frana.54$sum)
+tot94.quie.frana <- sum(quie.frana.94$sum)
+tot2017.quie.frana <- sum(quie.frana.2017$sum)
+tot54.quie.non <- sum(quie.non.54$sum) 
+tot94.quie.non <- sum(quie.non.94$sum)
+tot2017.quie.non <- sum(quie.non.2017$sum)
+
+att.frana.54$Copertura <- (att.frana.54$sum/tot54.att.frana)*100   # aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+att.frana.94$Copertura <- (att.frana.94$sum/tot94.att.frana)*100
+att.frana.2017$Copertura <- (att.frana.2017$sum/tot2017.att.frana)*100
+att.non.54$Copertura <- (att.non.54$sum/tot54.att.non)*100 
+att.non.94$Copertura <- (att.non.94$sum/tot94.att.non)*100
+att.non.2017$Copertura <- (att.non.2017$sum/tot2017.att.non)*100
+quie.frana.54$Copertura <- (quie.frana.54$sum/tot54.quie.frana)*100
+quie.frana.94$Copertura <- (quie.frana.94$sum/tot94.quie.frana)*100
+quie.frana.2017$Copertura <- (quie.frana.2017$sum/tot2017.quie.frana)*100
+quie.non.54$Copertura <- (quie.non.54$sum/tot54.quie.non)*100 
+quie.non.94$Copertura <- (quie.non.94$sum/tot94.quie.non)*100
+quie.non.2017$Copertura <- (quie.non.2017$sum/tot2017.quie.non)*100
+
+att.frana.54$Anno <- 1954   # aggiungo il campo corrispondente all'anno
+att.frana.94$Anno <- 1994
+att.frana.2017$Anno <- 2017
+att.non.54$Anno <- 1954 
+att.non.94$Anno <- 1994
+att.non.2017$Anno <- 2017
+quie.frana.54$Anno <- 1954
+quie.frana.94$Anno <- 1994
+quie.frana.2017$Anno <- 2017
+quie.non.54$Anno <- 1954 
+quie.non.94$Anno <- 1994
+quie.non.2017$Anno <- 2017
+
+total.att.frana <- rbind(att.frana.54, att.frana.94, att.frana.2017) # unisco i dataset
+total.att.non <- rbind(att.non.54, att.non.94, att.non.2017) 
+total.quie.frana <- rbind(quie.frana.54, quie.frana.94, quie.frana.2017)
+total.quie.non <- rbind(quie.non.54, quie.non.94, quie.non.2017) 
+
+
+level_order <- c('1954', '1994', '2017')
+
+# corpi franosi delle attive
+ggplot(total.att.frana, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="territorio interessato dai depositi di frana ATTIVI") +
+scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
+
+# fascia adiacente delle attive
+ggplot(total.att.non, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="fascia di 100m attorno ai depositi di frana ATTIVI") +
+scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
+
+#corpi franosi delle quiescenti
+ggplot(total.quie.frana, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="territorio interessato dai depositi di frana QUIESCENTI") +
+scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
+
+# fascia adiacente delle quiescenti
+ggplot(total.quie.non, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Class.Semp)) + geom_col(position = position_dodge()) + 
+labs(x="Anno", y="Copertura (%)", title="Classi d'uso del suolo", subtitle="fascia di 100m attorno ai depositi di frana QUIESCENTI") +
+scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
+
+
+
+
+
+
+
+
 
 
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
