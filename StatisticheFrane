@@ -358,7 +358,7 @@ axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.titl
 
 ######## Rc e pendenza
 
-ggplot(frane, aes(x=Pendenza, y=Rc)) + geom_point()  + 
+ggplot(frane, aes(x=Pendenza, y=Rc)) + geom_point()  +  geom_smooth(method = 'lm', orientation = "y") + 
 labs(x="Pendenza media (°)", y="Rapporto di circolarità") + theme(axis.text.x=element_text(size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
