@@ -614,12 +614,34 @@ axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.titl
 legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
 
 
+#############################################################################################
 
+############## CARTA FORESTALE
 
+setwd("C:/QGIS/Tesi.FraneBacinoReno/Nuova cartella")
+library(ggplot2)
 
+forest.frana <- read.table("Forestale.Frana.csv",head=TRUE,sep=",")
+forest.non <- read.table("Forestale.NonFrana.csv",head=TRUE,sep=",")
 
+tot.forest.frana <- sum(forest.frana$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot.forest.non <- sum(forest.non$sum)
 
+forest.frana$Copertura <- (forest.frana$sum/tot.forest.frana)*100   # aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+forest.non$Copertura <- (forest.non$sum/tot.forest.non)*100
 
+forest.frana$Posizione <- Aree di deposito franoso  # aggiungo il campo corrispondente al posizionamento
+forest.non$Posizione <- Altre aree
 
+total.forest <- rbind(forest.frana, forest.non) # unisco i dataset
+
+level_order <- c('Aree di deposito franoso', 'Altre aree')
+
+# corpi franosi delle attive
+ggplot(total.forest, aes(x = factor(Posizione, level = level_order), y = Copertura, fill = GovSemp)) + geom_col(position = position_dodge()) + 
+labs(y="Copertura (%)", title="Tipologie di governo") + scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_blank(), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), legend.title=element_blank()) +  ylim(0,60)
 
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
