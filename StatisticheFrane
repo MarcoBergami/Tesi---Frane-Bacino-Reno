@@ -618,7 +618,7 @@ legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subt
 
 ############## CARTA FORESTALE
 
-setwd("C:/QGIS/Tesi.FraneBacinoReno/Nuova cartella")
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
 library(ggplot2)
 
 forest.frana <- read.table("Forestale.Frana.csv",head=TRUE,sep=",")
@@ -630,8 +630,8 @@ tot.forest.non <- sum(forest.non$sum)
 forest.frana$Copertura <- (forest.frana$sum/tot.forest.frana)*100   # aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
 forest.non$Copertura <- (forest.non$sum/tot.forest.non)*100
 
-forest.frana$Posizione <- Aree di deposito franoso  # aggiungo il campo corrispondente al posizionamento
-forest.non$Posizione <- Altre aree
+forest.frana$Posizione <- "Aree di deposito franoso"  # aggiungo il campo corrispondente al posizionamento
+forest.non$Posizione <- "Altre aree"
 
 total.forest <- rbind(forest.frana, forest.non) # unisco i dataset
 
@@ -643,5 +643,115 @@ labs(y="Copertura (%)", title="Tipologie di governo") + scale_fill_brewer(palett
 geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
 axis.text.y=element_text(size=12), axis.title.x=element_blank(), axis.title.y=element_text(size=15), 
 legend.text = element_text(size=12), plot.title=element_text(size=15), legend.title=element_blank()) +  ylim(0,60)
+
+
+############# FORESTALE SU FRANE ATTIVE, QUIESCENTI E NON FRANA 
+
+forest.att <- read.table("Forestale.Attive.csv",head=TRUE,sep=",")
+forest.quie <- read.table("Forestale.Quiescenti.csv",head=TRUE,sep=",")
+forest.non <- read.table("Forestale.NonFrana.csv",head=TRUE,sep=",")
+
+tot.forest.att <- sum(forest.att$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot.forest.quie <- sum(forest.quie$sum)
+tot.forest.non <- sum(forest.non$sum)
+
+forest.att$Copertura <- (forest.att$sum/tot.forest.att)*100   # aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+forest.quie$Copertura <- (forest.quie$sum/tot.forest.quie)*100
+forest.non$Copertura <- (forest.non$sum/tot.forest.non)*100
+
+forest.att$Posizione.Stato <- "Depositi di frana attivi"  # aggiungo il campo corrispondente al posizionamento/stato di attività
+forest.quie$Posizione.Stato <- "Depositi di frana quiescenti" 
+forest.non$Posizione.Stato <- "Altre aree"
+
+total.forest <- rbind(forest.att, forest.quie, forest.non) # unisco i dataset
+
+level_order <- c('Depositi di frana attivi', 'Depositi di frana quiescenti', 'Altre aree')
+
+ggplot(total.forest, aes(x = factor(Posizione.Stato, level = level_order), y = Copertura, fill = GovSemp)) + geom_col(position = position_dodge()) + 
+labs(y="Copertura (%)", title="Tipologie di governo", subtitle="suddivisione in base allo stato d'attività") + scale_fill_brewer(palette = "Spectral") + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_blank(), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=12), legend.title=element_blank()) +  ylim(0,60)
+
+#################### FORESTALE: CLASSE DI PENDENZA 
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+
+forest <- read.table("Forestale.ArgScagliose.csv", head=TRUE, sep=",", quote = "\"")
+
+# pendenza per tipologia di governo
+ggplot(forest, aes(x=GovSigla, y=PendenzaMe)) +  geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") + 
+labs(x="Tipologia di governo", y="Pendenza media (°)") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
+# pendenza per tipologia di vegetazione
+ggplot(forest, aes(x=TIPO, y=PendenzaMe)) +  geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") +  
+labs(x="Tipologia di vegetazione", y="Pendenza media (°)") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
+
+############ FORESTALE: SPECIE PREVALENTI IN AREE DI SUCCESSIONE ABBANDONATE SU FRANE ATTIVE 
+
+install.packages("forcats")
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+library(forcats)
+
+# Tra le aree appartenenti ai depositi di frana attivi, intersezione tra le zone forestali che erano di successione nel 54 e le zone forestali che sono boscate nel 2017
+# dal risultato sono stati selezionati solo gli elementi esplicitamente non governati o irregolari (campo = TIPO_CARTA)
+# lo stesso è stato fatto con le aree di successione del 94 (al posto del 54) 
+# confrontando i dati in due grafici diversi: 1° specie e 2° specie prevalente
+
+succ.bosco.nongov.54 <- read.table("Successioni-Bosco.54-2017.csv", head=TRUE, sep=",")
+succ.bosco.nongov.94 <- read.table("Successioni-Bosco.94-2017.csv", head=TRUE, sep=",")
+succ.bosco.nongov.94.uniche <- read.table("Successioni-Bosco.94-2017.uniche.csv", head=TRUE, sep=",") 
+# le "uniche" sono le zone che sono a successione nel 94 ma non nel 54
+
+succ.bosco.nongov.54$Periodo <- "Aree boscate che erano di successione nel 1954" 
+succ.bosco.nongov.94.uniche$Periodo <- "Aree boscate che erano di successione nel 1994 ma non nel 1954" 
+
+total.specie <- rbind(succ.bosco.nongov.54, succ.bosco.nongov.94.uniche) # unisco i dataset
+
+
+
+
+ggplot(total.specie, aes(y = fct_infreq(PRIMA_SPEC), fill = Periodo)) + geom_col(stat = 'count', position = position_dodge()) + 
+labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
+geom_text(aes(label = freq, color=tipologia), position = position_dodge(0.9), vjust=-1.4, size=4.2) + 
+geom_text(aes(label = paste(freq.perc,"%", sep = "")), position = position_dodge(0.9), vjust=-0.5, size=2.8) +
+scale_color_manual(values = c("#006666","#FF0000")) +
+theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10), axis.text.y=element_text(size=12), 
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank()) + ylim(0,900)
+
+
+ggplot(df,aes(x = fct_infreq(Pclass))) + 	geom_bar(stat = 'count')
+
+
+
+
+ggplot(succ.bosco.nongov.54, aes(y=PRIMA_SPEC)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+# 2° spec
+ggplot(succ.bosco.nongov, aes(y=SECONDA__1)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+######################
+
+succ.bosco.nongov.94 <- read.table("succ.bosco.nongov.94.csv", head=TRUE, sep=",")
+
+ggplot(succ.bosco.nongov.94, aes(y=PRIMA_SPEC)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+# 2° spec
+ggplot(succ.bosco.nongov.94, aes(y=SECONDA__1)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
