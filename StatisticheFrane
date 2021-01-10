@@ -705,53 +705,130 @@ library(forcats)
 # confrontando i dati in due grafici diversi: 1° specie e 2° specie prevalente
 
 succ.bosco.nongov.54 <- read.table("Successioni-Bosco.54-2017.csv", head=TRUE, sep=",")
-succ.bosco.nongov.94 <- read.table("Successioni-Bosco.94-2017.csv", head=TRUE, sep=",")
+# succ.bosco.nongov.94 <- read.table("Successioni-Bosco.94-2017.csv", head=TRUE, sep=",")
 succ.bosco.nongov.94.uniche <- read.table("Successioni-Bosco.94-2017.uniche.csv", head=TRUE, sep=",") 
 # le "uniche" sono le zone che sono a successione nel 94 ma non nel 54
 
-succ.bosco.nongov.54$Periodo <- "Aree boscate che erano di successione nel 1954" 
-succ.bosco.nongov.94.uniche$Periodo <- "Aree boscate che erano di successione nel 1994 ma non nel 1954" 
+########## verifico la numerosità (freq): dal 54 per la 1° specie prevalente
+ggplot(succ.bosco.nongov.54, aes(y = fct_infreq(PRIMA_SPEC))) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-total.specie <- rbind(succ.bosco.nongov.54, succ.bosco.nongov.94.uniche) # unisco i dataset
+### 2° spec
+ggplot(succ.bosco.nongov.54, aes(y = fct_infreq(SECONDA__1))) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+########### verifico la numerosità (freq): dal 94 per la 1° specie prevalente
+ggplot(succ.bosco.nongov.94.uniche, aes(y = fct_infreq(PRIMA_SPEC))) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+### 2° spec
+ggplot(succ.bosco.nongov.94.uniche, aes(y = fct_infreq(SECONDA__1))) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
+labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
+axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
 
+### grafico con barre adiacenti della 1° specie
+
+classi <- c('Ulmus minor - Olmo campestre','Pseudotsuga menziesii - Douglasia','Prunus spinosa - Prugnolo','Pioppi americani ed ibridi','Fagus sylvatica - Faggio',
+'Pinus nigra - Pino nero','Fraxinus ornus - Orniello','Acer campestre - Acero campestre','Populus alba - Pioppo bianco','Ostrya carpinifolia - Carpino nero',
+'Salix alba - Salice bianco','Castanea sativa - Castagno','Robinia pseudoacacia - Robinia','Populus nigra - Pioppo nero','Quercus cerris - Cerro',
+'Quercus pubescens - Roverella')
+
+freq <- c(1,1,1,1,1,2,1,2,2,2,2,6,16,21,23,50) # dati realtivi al 54
+
+output.54 <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
+output.54$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 132)"
+output.54$freq.perc <- round(((output.54$freq/132)*100), 1)
+# View(output.54)
+
+freq <- c(NA,NA,NA,NA,NA,NA,1,NA,2,2,4,1,10,8,10,11) # dati realtivi al 94
+
+output.94 <- data.frame(classi,freq)
+output.94$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 49)"
+output.94$freq.perc <- round(((output.94$freq/49)*100), 1)
+
+unione.specie <- rbind(output.54, output.94) # unisco il dataframe 
 
 
-ggplot(total.specie, aes(y = fct_infreq(PRIMA_SPEC), fill = Periodo)) + geom_col(stat = 'count', position = position_dodge()) + 
-labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
-geom_text(aes(label = freq, color=tipologia), position = position_dodge(0.9), vjust=-1.4, size=4.2) + 
-geom_text(aes(label = paste(freq.perc,"%", sep = "")), position = position_dodge(0.9), vjust=-0.5, size=2.8) +
+ggplot(unione.specie, aes(x = freq, y = fct_rev(fct_inorder(classi)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Numero", y="1° specie prevalente", title="1° specie prevalente nelle aree boscate (di depositi di frana attivi)\nche derivano da aree di successione vegetazionale") +
+scale_fill_manual(values = c("#006666","#FF0000"))  + 
+geom_text(aes(label = freq, color=Periodo), position = position_dodge(0.9), vjust=0.4, hjust=-0.3,size=3.7) + 
 scale_color_manual(values = c("#006666","#FF0000")) +
-theme(axis.text.x=element_text(angle=30,face="bold",hjust=1,size=10), axis.text.y=element_text(size=12), 
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15)) + xlim(0,60)
+# geom_text(aes(label = paste("(",sprintf("%0.1f", freq.perc),"%",")", sep = "")), position = position_dodge(0.9), vjust=0.4, hjust=-0.7, size=3)
+
+####################### grafico con barre adiacenti della 2° specie
+
+classi.2specie <- c('Rubus (genere) - Rovo','Rosa Canina','Quercus ilex - Leccio','Fraxinus excelsior - Frassino maggiore','Cornus sanguinea - Sanguinello',
+'Acer pseudoplatanus - Acer di monte','Populus alba - Pioppo bianco','Acer campestre - Acero campestre','Prunus spinosa - Prugnolo','Alnus glutinosa - Ontano nero',
+'Castanea sativa - Castagno','Pinus nigra - Pino nero','Fraxinus ornus - Orniello','Salix alba - Salice bianco','Juniperus communis','Ostrya carpinifolia - Carpino nero',
+'Ulmus minor - Olmo campestre','Quercus pubescens - Roverella','Populus nigra - Pioppo nero','Robinia pseudoacacia - Robinia','Quercus cerris - Cerro',
+'Nessuna specie identificata')
+
+freq.2specie <- c(1,1,NA,1,1,NA,1,NA,2,1,3,5,5,4,7,6,12,14,11,15,17,25) # dati realtivi al 54
+
+output.54.2specie <- data.frame(classi.2specie,freq.2specie) # associamo i campi appena creati ad un dataframe (tabella) 
+output.54.2specie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 132)"
+output.54.2specie$freq.perc <- round(((output.54.2specie$freq.2specie/132)*100), 1)
+# View(output.54.2specie)
+
+freq.2specie <- c(NA,NA,1,NA,NA,1,1,2,1,2,1,1,1,3,NA,5,2,3,6,4,8,7) # dati realtivi al 94
+
+output.94.2specie <- data.frame(classi.2specie,freq.2specie)
+output.94.2specie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 49)"
+output.94.2specie$freq.perc <- round(((output.94.2specie$freq.2specie/49)*100), 1)
+
+unione.2specie <- rbind(output.54.2specie, output.94.2specie) # unisco il dataframe 
+
+
+ggplot(unione.2specie, aes(x = freq.2specie, y = fct_rev(fct_inorder(classi.2specie)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Numero", y="2° specie prevalente", title="2° specie prevalente nelle aree boscate (di depositi di frana attivi)\nche derivano da aree di successione vegetazionale") + 
+geom_text(aes(label = freq.2specie, color=Periodo), position = position_dodge(0.9), vjust=0.3, hjust=-0.3,size=3.3) + 
+scale_color_manual(values = c("#006666","#FF0000")) + scale_fill_manual(values = c("#006666","#FF0000")) + 
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), 
 axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title=element_blank()) + ylim(0,900)
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15)) + xlim(0,30)
+# geom_text(aes(label = paste("(",sprintf("%0.1f", freq.perc),"%",")", sep = "")), position = position_dodge(0.9), vjust=0.4, hjust=-0.7, size=3)
+
+###################
 
 
-ggplot(df,aes(x = fct_infreq(Pclass))) + 	geom_bar(stat = 'count')
+ggplot(total.specie, aes(y = fct_infreq(SECONDA__1), fill = Periodo)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
+labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
+geom_text(aes(label=..count.., color=Periodo),stat='count', position = position_dodge(0.9), hjust=-1.4, size=4.2) +
+scale_color_manual(values = c("#006666","#FF0000")) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), 
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank()) 
 
 
 
 
-ggplot(succ.bosco.nongov.54, aes(y=PRIMA_SPEC)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
-labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
-axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-# 2° spec
-ggplot(succ.bosco.nongov, aes(y=SECONDA__1)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
-labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
-axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-######################
 
-succ.bosco.nongov.94 <- read.table("succ.bosco.nongov.94.csv", head=TRUE, sep=",")
 
-ggplot(succ.bosco.nongov.94, aes(y=PRIMA_SPEC)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
-labs(x="Numero", y="1° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
-axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
 
-# 2° spec
-ggplot(succ.bosco.nongov.94, aes(y=SECONDA__1)) + geom_bar() + geom_text(stat='count', aes(label=..count..), size=4.2) +
-labs(x="Numero", y="2° specie prevalente") + theme(axis.text.x=element_text(face="bold",size=13),
-axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # newresults<-format(results,decimal.mark=",") # da esegure prima di salvare il csv: write.csv(frane, "frane.csv")
