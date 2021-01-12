@@ -719,27 +719,7 @@ theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(si
 legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13))
 
 
-geom_text(aes(label=..count.., color=Posizione),stat='count', position = position_dodge(0.9), vjust=0.5, hjust=-0.5,size=3.0) +
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-############ FORESTALE: SPECIE PREVALENTI IN AREE DI SUCCESSIONE ABBANDONATE SU FRANE ATTIVE 
+####################### FORESTALE: SPECIE PREVALENTI IN AREE DI SUCCESSIONE ABBANDONATE PRESENTI ALL'INTERNO DEI DEPOSITI FRANOSI 
 
 install.packages("forcats")
 
@@ -752,18 +732,18 @@ library(forcats)
 # lo stesso è stato fatto con le aree di successione del 94 (al posto del 54) 
 # confrontando i dati in due grafici diversi: 1° specie e 2° specie prevalente
 
-succ.bosco.54.att <- read.table("Successioni-Bosco.54-2017.att.csv", head=TRUE, sep=",")
-succ.bosco.94.att <- read.table("Successioni-Bosco.94-2017.att.csv", head=TRUE, sep=",")  # zone che sono a successione nel 94 ma non nel 54
+succ.bosco.54 <- read.table("Successioni-Bosco.54-2017.csv", head=TRUE, sep=",")
+succ.bosco.94 <- read.table("Successioni-Bosco.94-2017.csv", head=TRUE, sep=",")  # zone che sono a successione nel 94 ma non nel 54
 
-succ.bosco.54.att$Periodo <- "1954"
-succ.bosco.94.att$Periodo <- "1994"
+succ.bosco.54$Periodo <- "1954"
+succ.bosco.94$Periodo <- "1994"
 
-total.specie <- rbind(succ.bosco.54.att, succ.bosco.94.att)
+total.specie <- rbind(succ.bosco.54, succ.bosco.94)
 
 ########## verifico la numerosità (freq) per la 1° specie prevalente
-# fct_infreq: mantengo le barre ordinate in modo crescente oppure decrescente: fct_rev(fct_inorder())
+# fct_infreq: mantengo le barre ordinate in un verso, oppure nell'altro: fct_rev(fct_inorder())
 
-ggplot(total.specie, aes(y = fct_infreq(PRIMA_SPEC), fill = Periodo)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
+ggplot(total.specie, aes(y = fct_infreq(SECONDA__1), fill = Periodo)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
 labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
 geom_text(aes(label=..count.., color=Periodo),stat='count', position = position_dodge(0.9), hjust=-1.4, size=4.2) +
 scale_color_manual(values = c("#006666","#FF0000")) +
@@ -774,68 +754,73 @@ legend.text = element_text(size=12), legend.title=element_blank())
 
 ##################### grafico con barre adiacenti della 1° specie
 
-classi <- c('Pseudotsuga menziesii - Douglasia','Prunus spinosa - Prugnolo','Fagus sylvatica - Faggio','Ulmus minor - Olmo campestre','Pioppi americani ed ibridi',
-'Fraxinus ornus - Orniello','Acer campestre - Acero campestre','Pinus nigra - Pino nero','Populus alba - Pioppo bianco','Ostrya carpinifolia - Carpino nero',
-'Salix alba - Salice bianco','Castanea sativa - Castagno','Robinia pseudoacacia - Robinia','Populus nigra - Pioppo nero','Quercus cerris - Cerro',
-'Quercus pubescens - Roverella')
+classi <- c('Salix caprea - Salicone','Prunus avium - Ciliegio selvatico','Quercus ilex - Leccio','Fraxinus excelsior - Frassino maggiore',
+'Cornus sanguinea - Sanguinello','Rosa canina','Rubus (genere) - Rovo','Alnus glutinosa - Ontano nero','Juniperus communis - Ginepro comune',
+'Pseudotsuga menziesii - Douglasia','Pioppi americani ed ibridi','Fagus sylvatica - Faggio','Acer pseudoplatanus - Acero di monte','Prunus spinosa - Prugnolo',
+'Populus alba - Pioppo bianco','Acer campestre - Acero campestre','Fraxinus ornus - Orniello','Pinus nigra - Pino nero','Ulmus minor - Olmo campestre',
+'Salix alba - Salice bianco','Ostrya carpinifolia - Carpino nero','Castanea sativa - Castagno','Populus nigra - Pioppo nero','Robinia pseudoacacia - Robinia',
+'Quercus cerris - Cerro','Quercus pubescens - Roverella','Nessuna specie identificata')
 
-freq <- c(1,1,1,1,1,1,2,2,2,2,2,6,16,21,23,50) # dati realtivi al 54
+freq.1sp <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,1,1,2,NA,1,2,3,1,2,1,4,2,19,30,32,31,61,NA) # dati realtivi alle prime specie del 54
 
-output.54.att <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
-output.54.att$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 132)"
-# output.54.att$freq.perc <- round(((output.54$freq/132)*100), 1)
-# View(output.54.att)
+output.1.54 <- data.frame(classi,freq.1sp) # associamo i campi appena creati ad un dataframe (tabella) 
+output.1.54$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 193)"
+output.1.54$freq.perc.1sp <- round(((output.1.54$freq.1sp/193)*100), 1)
+# View(output.1.54)
 
-freq <- c(NA,NA,NA,1,1,1,NA,1,2,2,4,2,12,11,13,26) # dati realtivi al 94
+freq.1sp <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,NA,1,NA,2,1,2,1,1,5,2,3,18,23,25,39,NA) # dati realtivi alle prime specie del 94
 
-output.94.att <- data.frame(classi,freq)
-output.94.att$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 76)"
-# output.94.att$freq.perc <- round(((output.94$freq/76)*100), 1)
+output.1.94 <- data.frame(classi,freq.1sp)
+output.1.94$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 124)"
+output.1.94$freq.perc.1sp <- round(((output.1.94$freq.1sp/124)*100), 1)
 
-unione.specie.att <- rbind(output.54.att, output.94.att) # unisco il dataframe 
+unione.1specie <- rbind(output.1.54, output.1.94) # unisco il dataframe 
 
 
-ggplot(unione.specie.att, aes(x = freq, y = fct_rev(fct_inorder(classi)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
-labs(x="Frequenza", y="", title="1° specie prevalente su depositi di frana ATTIVI", subtitle="in aree boscate che derivano da aree di successione vegetazionale") +
-scale_fill_manual(values = c("#006666","#FF0000"))  + 
-geom_text(aes(label = freq, color=Periodo), position = position_dodge(0.9), vjust=0.4, hjust=-0.3,size=3.7) + 
-scale_color_manual(values = c("#006666","#FF0000")) +
+ggplot(unione.1specie, aes(x = freq.perc.1sp, y = fct_rev(fct_inorder(classi)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Frequenza relativa (%)", y="", title="1° specie prevalenti sui depositi di frana", 
+subtitle="in aree boscate non goverante che derivano da aree di successione vegetazionale") +
+scale_fill_manual(values = c("#006666","#FF0000"))  + scale_color_manual(values = c("#006666","#FF0000")) +
 theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,60)
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,35)
+
 # geom_text(aes(label = paste("(",sprintf("%0.1f", freq.perc),"%",")", sep = "")), position = position_dodge(0.9), vjust=0.4, hjust=-0.7, size=3)
+# geom_text(aes(label = freq, color=Periodo), position = position_dodge(0.9), vjust=0.4, hjust=-0.3,size=3.7) 
+
 
 ####################### grafico con barre adiacenti della 2° specie
 
-classi.2specie <- c('Rosa Canina','Quercus ilex - Leccio','Fraxinus excelsior - Frassino maggiore','Cornus sanguinea - Sanguinello','Acer pseudoplatanus - Acer di monte',
-'Rubus (genere) - Rovo','Populus alba - Pioppo bianco','Alnus glutinosa - Ontano nero','Acer campestre - Acero campestre','Prunus spinosa - Prugnolo',
-'Castanea sativa - Castagno','Fraxinus ornus - Orniello','Salix alba - Salice bianco','Pinus nigra - Pino nero','Juniperus communis - Ginepro comune',
-'Ostrya carpinifolia - Carpino nero','Ulmus minor - Olmo campestre','Populus nigra - Pioppo nero','Quercus pubescens - Roverella','Robinia pseudoacacia - Robinia',
-'Quercus cerris - Cerro','Nessuna specie identificata')
+# le classi sono le medesime riportate sopra
 
-freq.2specie <- c(1,NA,1,1,NA,1,1,1,NA,2,3,5,4,5,7,6,12,11,14,15,17,25) # dati realtivi al 54
+freq.2sp <- c(NA,1,NA,1,1,2,1,1,9,NA,NA,NA,NA,2,2,NA,5,5,16,8,11,4,17,20,25,21,41) # dati realtivi alle prime specie del 54
 
-output.54.att.2specie <- data.frame(classi.2specie,freq.2specie) # associamo i campi appena creati ad un dataframe (tabella) 
-output.54.att.2specie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 132)"
-# output.54.att.2specie$freq.perc <- round(((output.54.2specie$freq.2specie/132)*100), 1)
-# View(output.54.2specie)
+output.2.54 <- data.frame(classi,freq.2sp) # associamo i campi appena creati ad un dataframe (tabella) 
+output.2.54$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 193)"
+output.2.54$freq.perc.2sp <- round(((output.2.54$freq.2sp/193)*100), 1)
+# View(output.2.54)
 
-freq.2specie <- c(NA,1,NA,NA,1,1,1,1,2,2,1,1,3,3,1,7,4,9,8,10,12,8) # dati realtivi al 94
+freq.2sp <- c(1,NA,1,NA,NA,2,2,1,3,NA,NA,NA,2,2,1,4,1,4,7,8,11,3,15,15,17,13,11) # dati realtivi alle prime specie del 94
 
-output.94.att.2specie <- data.frame(classi.2specie,freq.2specie)
-output.94.att.2specie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 76)"
-# output.94.att.2specie$freq.perc <- round(((output.94.2specie$freq.2specie/49)*100), 1)
+output.2.94 <- data.frame(classi,freq.2sp)
+output.2.94$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 124)"
+output.2.94$freq.perc.2sp <- round(((output.2.94$freq.2sp/124)*100), 1)
 
-unione.2specie.att <- rbind(output.54.att.2specie, output.94.att.2specie) # unisco il dataframe 
+unione.2specie <- rbind(output.2.54, output.2.94) # unisco il dataframe 
 
 
-ggplot(unione.2specie.att, aes(x = freq.2specie, y = fct_rev(fct_inorder(classi.2specie)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
-labs(x="Frequenza", y="", title="2° specie prevalente su depositi di frana ATTIVI", subtitle="in aree boscate che derivano da aree di successione vegetazionale") + 
-geom_text(aes(label = freq.2specie, color=Periodo), position = position_dodge(0.9), vjust=0.3, hjust=-0.3,size=3.3) + 
-scale_color_manual(values = c("#006666","#FF0000")) + scale_fill_manual(values = c("#006666","#FF0000")) + 
-theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), 
-axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,30)
-# geom_text(aes(label = paste("(",sprintf("%0.1f", freq.perc),"%",")", sep = "")), position = position_dodge(0.9), vjust=0.4, hjust=-0.7, size=3)
+ggplot(unione.2specie, aes(x = freq.perc.2sp, y = fct_rev(fct_inorder(classi)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Frequenza relativa (%)", y="", title="2° specie prevalenti sui depositi di frana", 
+subtitle="in aree boscate non goverante che derivano da aree di successione vegetazionale") +
+scale_fill_manual(values = c("#006666","#FF0000"))  + scale_color_manual(values = c("#006666","#FF0000")) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,35)
+
+
+
+
+
+
+
 
 
 ###################  FORESTALE: SPECIE PREVALENTI IN AREE DI SUCCESSIONE ABBANDONATE SU FRANE QUIESCENTI
