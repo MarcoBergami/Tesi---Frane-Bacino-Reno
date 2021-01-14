@@ -699,7 +699,7 @@ plot.title=element_text(size=15), plot.subtitle=element_text(size=13))
 
 
 
-################ FORESTALE: CONFRONTO 1° SPECIE PREVALENTE TRA AREE (CON FORME DI GOVERNO ABBANDONATO O IRREGOLARE) DI FRANA E NON DI FRANA
+################ FORESTALE: CONFRONTO 1° SPECIE PREVALENTE TRA AREE (CON FORME DI GOVERNO ABBANDONATO O IRREGOLARE - GovSemp) DI FRANA E NON DI FRANA
 
 setwd("C:/QGIS/Tesi.FraneBacinoReno")
 library(ggplot2)
@@ -816,69 +816,180 @@ theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(si
 legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,35)
 
 
-
-
-
-
-
-
-
-###################  FORESTALE: SPECIE PREVALENTI IN AREE DI SUCCESSIONE ABBANDONATE SU FRANE QUIESCENTI
+#########################  FORESTALE: CONFRONTO 1° SPECIE PREVALENTI TRA GOVERNI ABBANDONATI (GovSemp) E LE ALTRE TIPOLOGIE DI GOVERNO
+##########################  ENTRO I DEPOSITI ATTIVI
 
 setwd("C:/QGIS/Tesi.FraneBacinoReno")
 library(ggplot2)
 library(forcats)
 
+Ispecie.att.nongov <- read.table("CartaForestale.Frana.Attive.NonGov.csv", head=TRUE, sep=",", quote = "\"") # la prima lettera è una i maiuscola
+Ispecie.att.gov <- read.table("CartaForestale.Frana.Attive.Gov.csv", head=TRUE, sep=",", quote = "\"") # tutte le altre aree governate entro i depositi attivi
 
-succ.bosco.54.quie <- read.table("Successioni-Bosco.54-2017.quie.csv", head=TRUE, sep=",")
-succ.bosco.94.quie <- read.table("Successioni-Bosco.94-2017.quie.csv", head=TRUE, sep=",")  # zone che sono a successione nel 94 ma non nel 54
+Ispecie.att.nongov$Gov <- "Forme di governo abbandonate o irregolari"
+Ispecie.att.gov$Gov <- "Forme di governo gestite"
 
-succ.bosco.54.quie$Periodo <- "1954"
-succ.bosco.94.quie$Periodo <- "1994"
+total.1specie.gov <- rbind(Ispecie.att.nongov, Ispecie.att.gov)
 
-total.specie <- rbind(succ.bosco.54.quie, succ.bosco.94.quie)
+########## verifico la numerosità (freq) per la 1° specie prevalente
+# fct_infreq: mantengo le barre ordinate in un verso, oppure nell'altro: fct_rev(fct_inorder())
 
-########## verifico la numerosità (freq) per la 1° specie prevalente o 2° specie prevalente
-
-ggplot(total.specie, aes(y = fct_infreq(SECONDA__1), fill = Periodo)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
+ggplot(total.1specie.gov, aes(y = fct_infreq(PRIMA_SPEC), fill = Gov)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
 labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
-geom_text(aes(label=..count.., color=Periodo),stat='count', position = position_dodge(0.9), hjust=-1.4, size=4.2) +
+geom_text(aes(label=..count.., color=Gov),stat='count', position = position_dodge(0.9), hjust=-1.4, size=4.2) +
 scale_color_manual(values = c("#006666","#FF0000")) +
 theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), 
 axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title=element_blank()) 
-
-##################### grafico con barre adiacenti della 1° specie
-
-classi <- c('Pseudotsuga menziesii - Douglasia','Pioppi americani ed ibridi','Prunus spinosa - Prugnolo','Acer pseudoplatanus - Acer di monte','Ulmus minor - Olmo campestre',
-'Fagus sylvatica - Faggio','Pinus nigra - Pino nero','Fraxinus ornus - Orniello','Populus alba - Pioppo bianco',
-'Ostrya carpinifolia - Carpino nero','Acer campestre - Acero campestre','Salix alba - Salice bianco','Castanea sativa - Castagno','Populus nigra - Pioppo nero',
-'Robinia pseudoacacia - Robinia','Quercus cerris - Cerro','Quercus pubescens - Roverella')
-
-freq <- c(1,1,NA,1,1,2,2,1,2,2,3,4,19,30,32,31,61) # dati realtivi al 54
-
-output.54.quie <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
-output.54.quie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1954 \n(n. aree: 132)"
-# output.54.quie$freq.perc <- round(((output.54.quie$freq/132)*100), 1)
-# View(output.54.quie)
-
-freq <- c(NA,NA,1,1,1,NA,1,2,2,2,1,5,3,18,23,25,39) # dati realtivi al 94
-
-output.94.quie <- data.frame(classi,freq)
-output.94.quie$Periodo <- "Aree boscate nel 2017 che \nerano di successione nel 1994 \nma non nel 1954 (n. aree: 76)"
-# output.94.quie$freq.perc <- round(((output.94.quie$freq/76)*100), 1)
-
-unione.specie.quie <- rbind(output.54.quie, output.94.quie) # unisco il dataframe 
+legend.text = element_text(size=12), legend.title=element_blank()) + xlim(0,600)
 
 
-ggplot(unione.specie.quie, aes(x = freq, y = fct_rev(fct_inorder(classi)), fill = Periodo)) + geom_col(position = position_dodge(), width = 0.7) + 
-labs(x="Frequenza", y="", title="1° specie prevalente su depositi di frana QUIESCENTI", subtitle="in aree boscate che derivano da aree di successione vegetazionale") +
-scale_fill_manual(values = c("#006666","#FF0000"))  + 
-geom_text(aes(label = freq, color=Periodo), position = position_dodge(0.9), vjust=0.4, hjust=-0.3,size=3.7) + 
-scale_color_manual(values = c("#006666","#FF0000")) +
+##################### grafico con barre adiacenti della 1° specie prevalente
+
+classi <- c('Prunus avium - Ciliegio selvatico','Pinus sylvestris - Pino silvestre','Juglans regia - Noce comune','Picea abies - Abete rosso',
+'Abies alba - Abete bianco','Hippophae rhamnoides - Olivello spinoso','Quercus ilex - Leccio','Crataegus monogyna - Biancospino','Salix caprea - Salicone',
+'Cornus sanguinea - Sanguinello','Ulmus minor - Olmo campestre','Spartium junceum - Ginestra odorosa','Prunus spinosa - Prugnolo',
+'Juniperus communis - Ginepro comune','Rubus (genere) - Rovo','Rosa canina','Fraxinus excelsior - Frassino maggiore','Pioppi americani ed ibridi',
+'Populus alba - Pioppo bianco','Salix alba - Salice bianco','Fraxinus ornus - Orniello','Acer campestre - Acero campestre','Populus nigra - Pioppo nero',
+'Robinia pseudoacacia - Robinia','Fagus sylvatica - Faggio','Pseudotsuga menziesii - Douglasia','Ostrya carpinifolia - Carpino nero','Castanea sativa - Castagno',
+'Pinus nigra - Pino nero','Quercus cerris - Cerro','Quercus pubescens - Roverella')
+
+freq <- c(NA,NA,NA,NA,NA,1,1,2,4,7,18,18,32,48,85,95,1,2,3,10,16,24,50,70,1,1,6,12,3,100,245) # dati realtivi alle prime specie delle aree non governate
+
+output.att.nongov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
+output.att.nongov$Governo <- "Forme di governo abbandonate \no irregolari (aree tot.: 855)"
+output.att.nongov$freq.perc <- round(((output.att.nongov$freq/855)*100), 1)
+# View(output.att.nongov)
+
+freq <- c(1,2,4,8,9,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,2,2,1,6,3,4,6,10,12,46,55,82,429,528) # dati realtivi alle prime specie delle aree non governate
+
+output.att.gov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
+output.att.gov$Governo <- "Forme di governo gestite \n(aree tot.: 1211)"
+output.att.gov$freq.perc <- round(((output.att.gov$freq/1211)*100), 1)
+
+unione.1specie.gov <- rbind(output.att.gov, output.att.nongov) # unisco i dataframe 
+
+
+ggplot(unione.1specie.gov, aes(x = freq.perc, y = fct_rev(fct_inorder(classi)), fill = Governo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Frequenza relativa (%)", y="", title="1° specie prevalenti sui depositi di frana attivi", 
+subtitle="Confronto tra aree di bosco abbandonate o irregolari ed aree governate") +
+scale_fill_manual(values = c("#006666","#FF0000"))  + scale_color_manual(values = c("#006666","#FF0000")) +
 theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
-legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) + xlim(0,60)
-# geom_text(aes(label = paste("(",sprintf("%0.1f", freq.perc),"%",")", sep = "")), position = position_dodge(0.9), vjust=0.4, hjust=-0.7, size=3)
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13)) 
+
+#########################  FORESTALE: CONFRONTO 1° SPECIE PREVALENTI TRA GOVERNI ABBANDONATI (GovSemp) E LE ALTRE TIPOLOGIE DI GOVERNO
+##########################  ENTRO TUTTI I DEPOSITI
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+library(forcats)
+
+Ispecie.frana.nongov <- read.table("CartaForestale.Frana.NonGov.csv", head=TRUE, sep=",", quote = "\"") # la prima lettera è una i maiuscola
+Ispecie.frana.gov <- read.table("CartaForestale.Frana.Gov.csv", head=TRUE, sep=",", quote = "\"") # tutte le altre aree governate entro i depositi
+
+Ispecie.frana.nongov$Gov <- "Forme di governo abbandonate o irregolari"
+Ispecie.frana.gov$Gov <- "Forme di governo gestite"
+
+total.1specie.gov <- rbind(Ispecie.frana.nongov, Ispecie.frana.gov)
+
+########## verifico la numerosità (freq) per la 1° specie prevalente
+# fct_infreq: mantengo le barre ordinate in un verso, oppure nell'altro: fct_rev(fct_inorder())
+
+ggplot(total.1specie.gov, aes(y = fct_infreq(PRIMA_SPEC), fill = Gov)) + geom_bar(position = position_dodge(preserve = "single"), width = 0.5) + 
+labs(x="Numero", y="1° specie prevalente") + scale_fill_manual(values = c("#006666","#FF0000"))  + 
+geom_text(aes(label=..count.., color=Gov),stat='count', position = position_dodge(0.9), hjust=-1.4, size=3.0) +
+scale_color_manual(values = c("#006666","#FF0000")) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), 
+axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank()) + xlim(0,900)
+
+##################### grafico con barre adiacenti della 1° specie prevalente
+
+classi <- c('Tilia x vulgaris - Tiglio ibrido','Pinus wallichiana - Pino dell’Himalaya','Picea pungens - Abete del Colorado','Larix decidua - Larice',
+'Celtis australis - Bogolaro','Prunus avium - Ciliegio selvatico','Pinus sylvestris - Pino silvestre','Juglans regia - Noce comune','Picea abies - Abete rosso',
+'Abies alba - Abete bianco','Hippophae rhamnoides - Olivello spinoso','Alnus glutinosa - Ontano nero','Quercus ilex - Leccio','Crataegus monogyna - Biancospino',
+'Cytisus scoparius - Ginestra dei carbonai','Salix caprea - Salicone','Cornus sanguinea - Sanguinello','Spartium junceum - Ginestra odorosa',
+'Prunus spinosa - Prugnolo','Juniperus communis - Ginepro comune','Rubus (genere) - Rovo','Rosa canina','Acer pseudoplatanus - Acero di monte',
+'Fraxinus excelsior - Frassino maggiore','Pioppi americani ed ibridi','Populus alba - Pioppo bianco','Salix alba - Salice bianco','Fraxinus ornus - Orniello',
+'Ulmus minor - Olmo campestre','Acer campestre - Acero campestre','Populus nigra - Pioppo nero','Robinia pseudoacacia - Robinia',
+'Pseudotsuga menziesii - Douglasia','Fagus sylvatica - Faggio','Ostrya carpinifolia - Carpino nero','Pinus nigra - Pino nero','Castanea sativa - Castagno',
+'Quercus pubescens - Roverella','Quercus cerris - Cerro')
+
+freq <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,1,2,2,3,4,9,18,48,56,115,120,1,1,4,4,13,21,32,50,78,114,1,4,15,4,55,339,157) # dati realtivi alle prime specie delle aree non governate
+
+output.frane.nongov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
+output.frane.nongov$Governo <- "Forme di governo abbandonate \no irregolari (aree tot.: 1303)"
+output.frane.nongov$freq.perc <- round(((output.frane.nongov$freq/1303)*100), 1)
+# View(output.frane.nongov)
+
+freq <- c(1,1,1,1,2,3,8,13,35,47,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2,9,5,6,1,10,2,7,11,10,43,69,115,175,194,811,843) # dati realtivi alle prime specie delle aree non governate
+
+output.frane.gov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
+output.frane.gov$Governo <- "Forme di governo gestite \n(aree tot.: 2425)"
+output.frane.gov$freq.perc <- round(((output.frane.gov$freq/2425)*100), 1)
+
+unione.1specie.gov <- rbind(output.frane.gov, output.frane.nongov) # unisco i dataframe 
+
+
+ggplot(unione.1specie.gov, aes(x = freq.perc, y = fct_rev(fct_inorder(classi)), fill = Governo)) + geom_col(position = position_dodge(), width = 0.7) + 
+labs(x="Frequenza relativa (%)", y="", title="1° specie prevalenti sui depositi di frana", 
+subtitle="Confronto tra aree di bosco abbandonate o irregolari ed aree governate") +
+scale_fill_manual(values = c("#006666","#FF0000"))  + scale_color_manual(values = c("#006666","#FF0000")) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13))
+
+
+################ ELENCO 1° E 2° SPECIE PREVALENTI NELLE AREE CHE ERANO DI SUCCESSIONE ('54 + '94) ENTRO I DEPOSITI DI FRANA
+
+succ.bosco54 <- read.table("Successioni-Bosco.54-2017.csv", head=TRUE, sep=",", quote = "\"") 
+succ.bosco94 <- read.table("Successioni-Bosco.94-2017.csv", head=TRUE, sep=",", quote = "\"") 
+
+
+succ.bosco <- rbind(succ.bosco54, succ.bosco94)
+
+########## verifico la numerosità (freq) per la 1° specie prevalente
+# fct_infreq: mantengo le barre ordinate in un verso, oppure nell'altro: fct_rev(fct_inorder())
+
+ggplot(succ.bosco, aes(y = fct_infreq(PRIMA_SPEC))) + geom_bar() + 
+labs(x="Numero", y="1° specie prevalente")  + 
+geom_text(aes(label=..count..),stat='count', size=3.0) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + xlim(0,900)
+
+########## verifico la numerosità (freq) per la 2° specie prevalente
+# fct_infreq: mantengo le barre ordinate in un verso, oppure nell'altro: fct_rev(fct_inorder())
+
+ggplot(succ.bosco, aes(y = fct_infreq(SECONDA__1))) + geom_bar() + 
+labs(x="Numero", y="2° specie prevalente")  + 
+geom_text(aes(label=..count..),stat='count', size=3.0) +
+theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
