@@ -959,7 +959,7 @@ legend.text = element_text(size=12), legend.title=element_blank()) + xlim(0,900)
 ##################### grafico con barre adiacenti della 1° specie prevalente
 
 classi <- c('Tilia x vulgaris - Tiglio ibrido','Pinus wallichiana - Pino dell’Himalaya','Picea pungens - Abete del Colorado','Larix decidua - Larice',
-'Celtis australis - Bogolaro','Prunus avium - Ciliegio selvatico','Pinus sylvestris - Pino silvestre','Juglans regia - Noce comune','Picea abies - Abete rosso',
+'Celtis australis - Bagolaro','Prunus avium - Ciliegio selvatico','Pinus sylvestris - Pino silvestre','Juglans regia - Noce comune','Picea abies - Abete rosso',
 'Abies alba - Abete bianco','Hippophae rhamnoides - Olivello spinoso','Alnus glutinosa - Ontano nero','Quercus ilex - Leccio','Crataegus monogyna - Biancospino',
 'Cytisus scoparius - Ginestra dei carbonai','Salix caprea - Salicone','Cornus sanguinea - Sanguinello','Spartium junceum - Ginestra odorosa',
 'Prunus spinosa - Prugnolo','Juniperus communis - Ginepro comune','Rubus (genere) - Rovo','Rosa canina','Acer pseudoplatanus - Acero di monte',
@@ -968,25 +968,24 @@ classi <- c('Tilia x vulgaris - Tiglio ibrido','Pinus wallichiana - Pino dell’
 'Pseudotsuga menziesii - Douglasia','Fagus sylvatica - Faggio','Ostrya carpinifolia - Carpino nero','Pinus nigra - Pino nero','Castanea sativa - Castagno',
 'Quercus pubescens - Roverella','Quercus cerris - Cerro')
 
-freq <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,1,2,2,3,4,9,18,48,56,115,120,1,1,4,4,13,21,32,50,78,114,1,4,15,4,55,339,157) # dati realtivi alle prime specie delle aree non governate
+freq <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,1,2,2,3,4,9,18,48,56,115,120,1,1,4,4,13,21,32,50,78,144,1,4,15,4,55,339,157) # dati realtivi alle prime specie delle aree non governate
 
 output.frane.nongov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
-output.frane.nongov$Governo <- "Forme di governo abbandonate \no irregolari (aree tot.: 1303)"
-output.frane.nongov$freq.perc <- round(((output.frane.nongov$freq/1303)*100), 1)
+output.frane.nongov$Governo <- "Aree non governate, abbandonate \no irregolari (aree tot.: 1302)"
+output.frane.nongov$freq.perc <- round(((output.frane.nongov$freq/1302)*100), 1)
 # View(output.frane.nongov)
 
-freq <- c(1,1,1,1,2,3,8,13,35,47,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2,9,5,6,1,10,2,7,11,10,43,69,115,175,194,811,843) # dati realtivi alle prime specie delle aree non governate
+freq <- c(1,1,1,1,2,3,8,13,35,47,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2,9,5,6,1,10,2,7,11,10,43,69,115,175,194,811,843) # dati realtivi alle prime specie delle aree governate
 
 output.frane.gov <- data.frame(classi,freq) # associamo i campi appena creati ad un dataframe (tabella) 
-output.frane.gov$Governo <- "Forme di governo gestite \n(aree tot.: 2425)"
+output.frane.gov$Governo <- "Aree governate \n(aree tot.: 2425)"
 output.frane.gov$freq.perc <- round(((output.frane.gov$freq/2425)*100), 1)
 
 unione.1specie.gov <- rbind(output.frane.gov, output.frane.nongov) # unisco i dataframe 
 
 
 ggplot(unione.1specie.gov, aes(x = freq.perc, y = fct_rev(fct_inorder(classi)), fill = Governo)) + geom_col(position = position_dodge(), width = 0.7) + 
-labs(x="Frequenza relativa (%)", y="", title="1° specie prevalenti sui depositi di frana", 
-subtitle="Confronto tra aree di bosco abbandonate o irregolari ed aree governate") +
+labs(x="Frequenza relativa (%)", y="", title="Specie prevalenti sui depositi di frana") +
 scale_fill_manual(values = c("#006666","#FF0000"))  + scale_color_manual(values = c("#006666","#FF0000")) +
 theme(axis.text.x=element_text(face="bold",size=10), axis.text.y=element_text(size=10), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
 legend.text = element_text(size=12), legend.title=element_blank(), plot.title=element_text(size=15), plot.subtitle=element_text(size=13))
