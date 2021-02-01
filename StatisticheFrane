@@ -734,11 +734,18 @@ library(ggplot2)
 
 forest <- read.table("Forestale.ArgScagliose.csv", head=TRUE, sep=",", quote = "\"")
 forest.nongov <- read.table("NonGovernato.ArgScagliose.csv", head=TRUE, sep=",", quote = "\"")
+forest.frana.att <- read.table("CartaForestale.Frana.Attive.csv", head=TRUE, sep=",", quote = "\"")
 
-# pendenza per tipologia di governo
+# pendenza per tipologia di governo su tutte le aree forestali dell'area di studio
 ggplot(forest, aes(x=GovSigla, y=PendenzaMe)) +  geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") + 
 labs(x="Tipologia di governo", y="Pendenza media (°)") + theme(axis.text.x=element_text(face="bold",size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
+# pendenza per tipologia di governo solo per le aree forestali delle frane attive
+ggplot(forest.frana.att, aes(x=GovSigla, y=PendenzaMe)) +  geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") + 
+labs(x="Tipologia di governo", y="Pendenza media (°)") + theme(axis.text.x=element_text(face="bold",size=11),
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
+
 
 # pendenza per tipologia di vegetazione
 ggplot(forest, aes(x=TIPO, y=PendenzaMe)) +  geom_boxplot() + stat_summary(fun.y=mean, geom="point", shape=21, size=5, color="red") +  
