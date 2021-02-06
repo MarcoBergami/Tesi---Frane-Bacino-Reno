@@ -667,6 +667,41 @@ geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.
 axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
 legend.text = element_text(size=12), plot.title=element_text(size=15), plot.subtitle=element_text(size=13), legend.title=element_blank()) +  ylim(0,60)
 
+############################################################################################
+
+###################### COPERTURE SUOLO ROCCA PITIGLIANA
+
+# USO DEL SUOLO
+
+setwd("C:/QGIS/Tesi.FraneBacinoReno")
+library(ggplot2)
+library(gridExtra)
+
+RoccaPit03 <- read.table("CopertureRoccaPitigliana2003.csv",head=TRUE,sep=",")
+RoccaPit11 <- read.table("CopertureRoccaPitigliana2011.csv",head=TRUE,sep=",")
+RoccaPit18 <- read.table("CopertureRoccaPitigliana2018.csv",head=TRUE,sep=",")
+
+tot2003 <- sum(RoccaPit03$sum) # somma dei valori delle aree totali delle categorie di uso del suolo
+tot2011 <- sum(RoccaPit11$sum)
+tot2018 <- sum(RoccaPit18$sum)
+
+RoccaPit03$Copertura <- (RoccaPit03$sum/tot2003)*100 #aggiungo il campo corrispondente alla copertura percentuale per ogni categoria di uso del suolo
+RoccaPit11$Copertura <- (RoccaPit11$sum/tot2011)*100
+RoccaPit18$Copertura <- (RoccaPit18$sum/tot2018)*100
+
+
+total <- rbind(RoccaPit03, RoccaPit11, RoccaPit18) # unisco i dataset
+# total$Copertura <- round(total$Copertura, digits = 1) # approssimo i valori di copertura percentuale ad una cifra decimale
+
+level_order <- c('2003', '2011', '2018')
+
+ggplot(total, aes(x = factor(Anno, level = level_order), y = Copertura, fill = Tipo)) + geom_col(position = position_dodge()) + 
+labs(fill="Copertura superficiale", x="Anno", y="Copertura (%)") + scale_fill_brewer(palette = "Spectral")  + 
+geom_text(aes(label = sprintf("%0.1f", Copertura)), position = position_dodge(0.9), vjust=-0.5, size=4.2) + theme(axis.text.x=element_text(face="bold",size=12),
+axis.text.y=element_text(size=12), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15), 
+legend.text = element_text(size=12), legend.title = element_text(size=15))  
+
+
 
 #############################################################################################
 
