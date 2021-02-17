@@ -70,7 +70,7 @@ frane$range.area <- cut(frane$SHAPE_Area, breaks = classi.area, include.lowest =
 
 ggplot(frane, aes(x=range.area)) + geom_bar() + geom_text(stat='count', aes(label=..count..), vjust=-1.6, size=4.2) + 
 geom_text(aes(label = paste("(",scales::percent(..prop.., accuracy = 0.1),")", sep = ""), group = 1), stat= "count", vjust=-0.5, size=3.6) +
-labs(x="Area dei depositi franosi (mq)", y="Numero") +
+labs(x="Area dei depositi franosi (m^2)", y="Numero") +
 theme(axis.text.x=element_text(angle=30,face="bold",size=10,hjust=1), axis.text.y=element_text(size=13), 
 axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +  ylim(0, 1750)
 
@@ -99,18 +99,18 @@ labs(x="Classi (mq)", y="Numero") + scale_fill_brewer(palette = "Spectral")
 ######## Scatterplot tra area e tipologia
 
 y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
-y.lab <- c('0','10 000','50 000','100 000','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
+y.lab <- c('0','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
 
 ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point() + 
-labs(x="Tipologia di movimenti franosi", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
+labs(x="Tipologia di movimenti franosi", y="Area del deposito franoso (m^2)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
-scale_y_continuous(breaks = y.break, labels = y.lab) + geom_hline(yintercept = 100000) + geom_hline(yintercept = 250000)
+scale_y_continuous(breaks = y.break, labels = y.lab)
 
 log.break <- c(100,1000,10000,100000,1000000)
 log.labs <- c(100,1000,10000,50000,100000,250000,500000,1000000)
 
 ggplot(frane, aes(x=SIGLA_Tip, y=SHAPE_Area)) + geom_point() + 
-labs(x="Tipologia di movimenti franosi", y="Log10 - Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
+labs(x="Tipologia di movimenti franosi", y="Log10 - Area del deposito franoso (m^2)") + theme(axis.text.x=element_text(face="bold",size=11,angle=20,hjust=1),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
 scale_y_log10(breaks = log.break, labels = trans_format("log10", math_format(10^.x))) + 
 geom_hline(aes(yintercept = 10000, colour = 'dark grey')) + geom_hline(aes(yintercept = 50000, colour = 'dark grey')) + 
@@ -356,20 +356,20 @@ y.break <- c(0,250000,500000,750000,1000000,1250000,1500000)
 y.lab <- c('0','250 000','500 000','750 000','1 000 000','1 250 000','1 500 000')
 
 Pend.Area <- ggplot(frane.vers, aes(x=Pendenza, y=SHAPE_Area)) + geom_point() + 
-labs(x="Pendenza media (°)", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11),
+labs(x="Pendenza media (°)", y="Area del deposito franoso (m^2)") + theme(axis.text.x=element_text(face="bold",size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) +
-scale_y_continuous(breaks = y.break, labels = y.lab) + 
+scale_y_continuous(breaks = y.break, labels = y.lab)
 
 Disl.Area <- ggplot(frane.vers, aes(x=Dislivello, y=SHAPE_Area)) + geom_point() + 
-labs(x="Dislivello altimetrico (m)", y="Area del deposito franoso (mq)") + theme(axis.text.x=element_text(face="bold",size=11),
+labs(x="Dislivello altimetrico (m)", y="Area del deposito franoso (m^2)") + theme(axis.text.x=element_text(face="bold",size=11),
 axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + 
-scale_y_continuous(breaks = y.break, labels = y.lab)
+scale_y_continuous(breaks = y.break, labels = y.lab) + geom_smooth(method = 'loess')
 
 grid.arrange(Pend.Area, Disl.Area, nrow = 1)
 
 ggplot(frane.vers, aes(x=Dislivello, y=SHAPE_Leng)) + geom_point() + 
 labs(x="Dislivello altimetrico (m)", y="Perimetro (m)") + theme(axis.text.x=element_text(face="bold",size=11),
-axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) + geom_smooth(method = 'loess')
+axis.text.y=element_text(size=13), axis.title.x=element_text(size=15), axis.title.y=element_text(size=15)) 
 
 ###########################################################################################
 
